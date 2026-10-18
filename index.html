@@ -1,0 +1,1342 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Ark: the smart home hub that keeps your home's data in your home. No account, works offline, encrypted backups to your own cloud.">
+<title>Ark Smart Home</title>
+</head>
+<body>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Fredoka:wght@500;600;700&display=swap">
+<style>
+/* Layout: the app's own look - gray ground, white rounded tiles, blue accent -
+   blown up into big tiles. The hero is a live, synced phone + laptop. */
+:root {
+  --bg: #f9fafb;        /* gray-50: the app's page */
+  --tile: #ffffff;      /* tiles and cards */
+  --line: #e5e7eb;      /* gray-200 tile border */
+  --chip: #f3f4f6;      /* gray-100 icon chip */
+  --ink: #111827;       /* gray-900 */
+  --muted: #6b7280;     /* gray-500 */
+  --soft: #4b5563;      /* gray-600 */
+  --blue: #2563eb;      /* blue-600: the app's accent */
+  --blue-soft: #dbeafe; /* blue-100 */
+  --blue-ink: #2563eb;
+  --red: #dc2626; --red-soft: #fee2e2;
+  --amber: #b45309; --amber-soft: #fef3c7;
+  --green: #059669;
+  --shadow: 0 1px 2px rgb(16 24 40 / 6%), 0 8px 24px -12px rgb(16 24 40 / 18%);
+  --sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #111827; --tile: #1f2937; --line: #374151; --chip: #374151; --ink: #ffffff; --muted: #9ca3af; --soft: #d1d5db;
+    --blue: #3b82f6; --blue-soft: rgb(30 58 138 / 45%); --blue-ink: #60a5fa;
+    --red: #f87171; --red-soft: rgb(127 29 29 / 45%); --amber: #fbbf24; --amber-soft: rgb(120 53 15 / 45%); --green: #34d399;
+    --shadow: 0 1px 2px rgb(0 0 0 / 30%), 0 10px 30px -14px rgb(0 0 0 / 60%); color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #111827; --tile: #1f2937; --line: #374151; --chip: #374151; --ink: #ffffff; --muted: #9ca3af; --soft: #d1d5db;
+  --blue: #3b82f6; --blue-soft: rgb(30 58 138 / 45%); --blue-ink: #60a5fa;
+  --red: #f87171; --red-soft: rgb(127 29 29 / 45%); --amber: #fbbf24; --amber-soft: rgb(120 53 15 / 45%); --green: #34d399;
+  --shadow: 0 1px 2px rgb(0 0 0 / 30%), 0 10px 30px -14px rgb(0 0 0 / 60%); color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 16px; line-height: 1.6; padding-inline: 16px; -webkit-font-smoothing: antialiased; }
+.wrap { max-width: 1160px; margin-inline: auto; }
+h1, h2, h3 { margin: 0; line-height: 1.1; letter-spacing: -0.025em; text-wrap: balance; }
+p { margin: 0; }
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; border-radius: 6px; }
+.icon { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+.eyebrow { font-size: 13px; font-weight: 600; color: var(--blue-ink); }
+.lead { color: var(--soft); font-size: 18px; max-width: 58ch; }
+.tile { background: var(--tile); border: 1px solid var(--line); border-radius: 16px; box-shadow: var(--shadow); }
+.chip-ico { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 10px; background: var(--chip); color: var(--muted); flex: none; }
+.chip-ico.on { background: var(--blue-soft); color: var(--blue-ink); }
+.chip-ico.alarm { background: var(--red-soft); color: var(--red); }
+
+/* Top bar - like the app header */
+.bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 10; margin-inline: -16px; padding: 10px 16px; background: color-mix(in srgb, var(--tile) 85%, transparent); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
+.bar .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 19px; text-decoration: none; color: var(--ink); }
+.brand img { width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--line); }
+.bar nav { display: flex; gap: 6px; }
+.bar nav a { padding: 6px 12px; border-radius: 8px; text-decoration: none; color: var(--soft); font-size: 14px; font-weight: 500; }
+.bar nav a:hover { background: var(--chip); color: var(--ink); }
+@media (max-width: 720px) { .bar nav { display: none; } }
+
+.btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 20px; border-radius: 10px; font-weight: 600; font-size: 15px; text-decoration: none; border: 1px solid var(--line); background: var(--tile); color: var(--ink); cursor: pointer; }
+.btn.primary { background: var(--blue); border-color: var(--blue); color: #fff; }
+.btn.primary:hover { filter: brightness(1.08); }
+
+/* --- Hero ---------------------------------------------------------------- */
+.hero { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: 48px; align-items: center; padding-block: 56px 64px; }
+.hero h1 { font-size: clamp(40px, 6vw, 66px); font-weight: 800; margin-top: 12px; }
+.hero h1 span { color: var(--blue-ink); }
+.hero .lead { margin-top: 20px; }
+.row { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
+.pills { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 28px; }
+.pill { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 999px; background: var(--tile); border: 1px solid var(--line); font-size: 13px; font-weight: 500; color: var(--soft); }
+.pill .icon { width: 15px; height: 15px; color: var(--green); }
+@media (max-width: 900px) { .hero { grid-template-columns: 1fr; padding-block: 36px 48px; } }
+
+/* Live demo: a laptop and a phone running the app, kept in sync */
+.demo { position: relative; padding-bottom: 28px; }
+.laptop { padding: 0; overflow: hidden; }
+.laptop .chrome { display: flex; align-items: center; gap: 6px; padding: 10px 14px; border-bottom: 1px solid var(--line); }
+.laptop .chrome i { width: 10px; height: 10px; border-radius: 50%; background: var(--line); }
+.laptop .chrome span { margin-left: 8px; font-family: var(--mono); font-size: 11px; color: var(--muted); }
+.screen { padding: 16px; background: var(--bg); }
+.screen h4 { margin: 0 0 12px; font-size: 15px; }
+.grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.dtile { position: relative; display: flex; flex-direction: column; justify-content: space-between; min-height: 112px; padding: 12px; border-radius: 12px; border: 1px solid var(--line); background: var(--tile); text-align: left; cursor: pointer; transition: border-color .2s, box-shadow .2s, transform .15s; }
+.dtile:hover { box-shadow: var(--shadow); }
+.dtile:active { transform: scale(.98); }
+.dtile .top { display: flex; align-items: flex-start; justify-content: space-between; gap: 6px; }
+.dtile .name { font-size: 13px; font-weight: 500; color: var(--ink); margin-top: 8px; }
+.dtile .state { font-size: 13px; font-weight: 600; color: var(--soft); }
+.dtile .state.on { color: var(--blue-ink); }
+.dtile .state.alarm { color: var(--red); }
+.dtile.alarm { border-color: var(--red); }
+.toggle { position: relative; width: 38px; height: 22px; border-radius: 999px; background: var(--line); transition: background .2s; flex: none; }
+.toggle::after { content: ""; position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; border-radius: 50%; background: #fff; box-shadow: 0 1px 2px rgb(0 0 0 / 25%); transition: transform .2s; }
+.toggle.on { background: var(--blue); }
+.toggle.on::after { transform: translateX(16px); }
+.phone { position: absolute; right: -6px; bottom: 0; width: 210px; border-radius: 30px; padding: 8px; background: #0b1220; box-shadow: 0 24px 50px -18px rgb(0 0 0 / 55%); }
+.phone .screen { border-radius: 23px; padding: 26px 10px 12px; min-height: 360px; position: relative; overflow: hidden; }
+.phone .notch { position: absolute; top: 8px; left: 50%; width: 60px; height: 14px; margin-left: -30px; border-radius: 10px; background: #0b1220; }
+.phone .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.phone .dtile { min-height: 92px; padding: 10px; }
+.phone .chip-ico { width: 32px; height: 32px; border-radius: 8px; }
+.phone .chip-ico .icon { width: 16px; height: 16px; }
+.phone .dtile .name, .phone .dtile .state { font-size: 11.5px; }
+.phone .toggle { width: 32px; height: 19px; }
+.phone .toggle::after { width: 13px; height: 13px; }
+.phone .toggle.on::after { transform: translateX(13px); }
+.laptop .screen { padding-right: 220px; min-height: 330px; }
+.banner { position: absolute; left: 10px; right: 10px; top: 10px; display: flex; gap: 10px; align-items: flex-start; padding: 10px 12px; border-radius: 12px; background: #1f2937; color: #fff; font-size: 12.5px; line-height: 1.35; box-shadow: 0 10px 24px -10px rgb(0 0 0 / 50%); transform: translateY(-140%); opacity: 0; transition: transform .35s cubic-bezier(.2,.9,.3,1.2), opacity .25s; z-index: 2; }
+.banner.show { transform: none; opacity: 1; }
+.banner b { display: block; }
+.banner .icon { color: #f87171; margin-top: 1px; }
+.hint { position: absolute; left: 0; bottom: 0; font-size: 13px; color: var(--muted); display: flex; align-items: center; gap: 6px; }
+.hint .icon { width: 16px; height: 16px; color: var(--blue-ink); }
+@media (max-width: 900px) {
+  .laptop .screen { padding-right: 16px; }
+  .demo .phone { position: relative; right: auto; margin: -60px 0 0 auto; }
+  .hint { position: static; margin-top: 12px; }
+}
+@media (max-width: 520px) {
+  .laptop { display: none; }
+  .demo .phone { margin: 0 auto; width: 250px; }
+}
+
+/* --- Sections ----------------------------------------------------------- */
+section { padding-block: 64px; }
+.head { display: grid; gap: 12px; margin-bottom: 32px; }
+.head h2 { font-size: clamp(30px, 4vw, 44px); font-weight: 800; }
+
+/* Fit picker + big product tiles */
+.seg { display: inline-flex; flex-wrap: wrap; gap: 4px; padding: 4px; border-radius: 12px; background: var(--chip); margin-bottom: 20px; }
+.seg button { border: 0; background: transparent; padding: 8px 14px; border-radius: 9px; font-size: 14px; font-weight: 600; color: var(--soft); cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--tile); color: var(--ink); box-shadow: 0 1px 2px rgb(0 0 0 / 12%); }
+.products { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+.product { display: grid; grid-template-rows: auto auto auto 1fr auto; gap: 10px; padding: 20px; text-align: left; cursor: pointer; transition: border-color .2s, transform .2s, box-shadow .2s; min-width: 0; }
+.product:hover { transform: translateY(-2px); }
+.product[aria-pressed="true"] { border-color: var(--blue); box-shadow: 0 0 0 3px var(--blue-soft), var(--shadow); }
+.product .art { aspect-ratio: 4 / 3; max-width: 100%; border-radius: 12px; background: var(--bg); border: 1px solid var(--line); display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.product .art svg { width: 100%; height: 100%; }
+.product h3 { font-size: 22px; font-weight: 800; }
+.product .for { font-size: 14px; font-weight: 600; color: var(--blue-ink); }
+.product ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 7px; font-size: 14px; color: var(--soft); }
+.product li { display: flex; gap: 8px; }
+.product li .icon { width: 16px; height: 16px; color: var(--green); margin-top: 3px; }
+.product .spec { font-family: var(--mono); font-size: 11.5px; color: var(--muted); padding-top: 10px; border-top: 1px solid var(--line); }
+.foot { margin-top: 18px; font-size: 14px; color: var(--muted); }
+@media (max-width: 1000px) { .products { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 560px) { .products { grid-template-columns: 1fr; } }
+
+/* Where data lives: three big tiles */
+.trio { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.trio .tile { padding: 24px; display: grid; gap: 12px; align-content: start; min-width: 0; }
+.trio h3 { font-size: 20px; font-weight: 700; }
+.trio p { color: var(--soft); font-size: 15px; }
+.trio code { font-family: var(--mono); font-size: 13px; background: var(--chip); padding: 1px 6px; border-radius: 5px; }
+.trio .tile.out .chip-ico { background: var(--amber-soft); color: var(--amber); }
+@media (max-width: 860px) { .trio { grid-template-columns: 1fr; } }
+
+/* Backup demo */
+.vault { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: 16px; }
+.vault > .tile { padding: 24px; min-width: 0; }
+label.field { display: grid; gap: 6px; font-size: 14px; font-weight: 600; }
+input.text { width: 100%; padding: 12px 14px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); font: 500 16px var(--mono); }
+input.text:focus { outline: 2px solid var(--blue); outline-offset: 0; border-color: var(--blue); }
+.dest { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+.dest button { display: inline-flex; align-items: center; gap: 6px; padding: 8px 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--tile); font-size: 14px; font-weight: 500; cursor: pointer; }
+.dest button[aria-pressed="true"] { border-color: var(--blue); background: var(--blue-soft); color: var(--blue-ink); }
+.flow { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 12px; margin-bottom: 18px; }
+.flow .end { display: grid; justify-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: var(--soft); text-align: center; max-width: 110px; }
+.flow .wire { height: 2px; background: repeating-linear-gradient(90deg, var(--amber) 0 8px, transparent 8px 14px); background-size: 28px 2px; animation: wire 1s linear infinite; }
+@keyframes wire { to { background-position: 28px 0; } }
+.bytes { font-family: var(--mono); font-size: 12.5px; line-height: 1.7; word-break: break-all; padding: 14px; border-radius: 12px; background: var(--bg); border: 1px solid var(--line); color: var(--soft); min-height: 132px; }
+.bytes .plain { color: var(--ink); }
+.cap { margin-top: 10px; font-size: 13px; color: var(--muted); }
+.facts { margin: 18px 0 0; display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 8px 16px; font-size: 14px; }
+.facts dt { color: var(--muted); font-weight: 500; }
+.facts dd { margin: 0; }
+.warn { margin-top: 18px; display: flex; gap: 10px; padding: 12px 14px; border-radius: 12px; background: var(--amber-soft); color: var(--ink); font-size: 14px; }
+.warn .icon { color: var(--amber); margin-top: 2px; }
+@media (max-width: 860px) { .vault { grid-template-columns: 1fr; } }
+
+/* People */
+.people { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.people .tile { padding: 24px; display: grid; gap: 10px; align-content: start; min-width: 0; }
+.people h3 { font-size: 19px; font-weight: 700; }
+.people p { color: var(--soft); font-size: 15px; }
+.rooms { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+.rooms span { font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 999px; background: var(--chip); color: var(--muted); }
+.rooms span.mine { background: var(--blue-soft); color: var(--blue-ink); }
+@media (max-width: 860px) { .people { grid-template-columns: 1fr; } }
+
+/* Compare: tiles drifting right to left; pause on hover/focus */
+.marquee { overflow: hidden; margin-inline: -16px; padding: 8px 16px 20px; -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent); mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent); }
+.track { display: flex; gap: 16px; width: max-content; animation: drift 60s linear infinite; }
+.marquee:hover .track, .marquee:focus-within .track { animation-play-state: paused; }
+@keyframes drift { to { transform: translateX(calc(-50% - 8px)); } }
+.ctile { width: 300px; flex: none; padding: 22px; display: grid; gap: 12px; align-content: start; }
+.ctile h3 { font-size: 19px; font-weight: 700; min-height: 2.3em; }
+.ctile p { font-size: 15px; display: grid; gap: 2px; }
+.ctile p span { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
+.ark-a { color: var(--ink); font-weight: 600; padding: 12px 14px; border-radius: 12px; background: var(--blue-soft); }
+.ark-a span { color: var(--blue-ink); }
+.them-a { color: var(--muted); padding: 0 14px; }
+.them-a span { color: var(--muted); }
+@media (prefers-reduced-motion: reduce) {
+  .marquee { overflow-x: auto; -webkit-mask-image: none; mask-image: none; }
+  .track { animation: none; }
+  .track [aria-hidden="true"] { display: none; }
+}
+.note { margin-top: 12px; font-size: 13px; color: var(--muted); max-width: 72ch; }
+
+/* --- Setup videos: an animated walkthrough in a video player -------------- */
+.player { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+.vid { position: relative; aspect-ratio: 16 / 10; border-radius: 16px; overflow: hidden; background: radial-gradient(120% 90% at 20% 10%, #1e3a8a 0%, #0b1220 60%); container-type: size; color: #fff; }
+.scene { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: 6cqw; padding: 13cqh 6cqw 15cqh; opacity: 0; transition: opacity .45s; pointer-events: none; }
+.scene.on { opacity: 1; }
+.stitle { position: absolute; left: 4cqw; top: 4cqh; display: flex; align-items: center; gap: 1.6cqw; font-weight: 700; font-size: 4.2cqh; letter-spacing: -0.01em; }
+.stitle b { display: inline-flex; align-items: center; justify-content: center; width: 6.4cqh; height: 6.4cqh; border-radius: 50%; background: #2563eb; font-size: 3.6cqh; }
+.vphone { height: 72cqh; aspect-ratio: 9 / 18.5; border-radius: 4.5cqh; padding: 1.1cqh; background: #020617; box-shadow: 0 3cqh 8cqh -2cqh rgb(0 0 0 / 70%); flex: none; font-size: 2.2cqh; }
+.vscreen { position: relative; height: 100%; border-radius: 3.6cqh; overflow: hidden; background: #f9fafb; color: #111827; padding: 3.4cqh 1.6cqh 1.6cqh; display: flex; flex-direction: column; gap: 1.1cqh; }
+.vscreen h5 { margin: 0; font-size: 1.25em; font-weight: 700; }
+.vscreen .sub { font-size: .9em; color: #6b7280; }
+.vfield { display: grid; gap: .3em; font-size: .85em; font-weight: 600; color: #374151; }
+.vfield span.box { display: block; min-height: 2.2em; padding: .45em .6em; border-radius: .6em; border: 1px solid #d1d5db; background: #fff; font-weight: 500; color: #111827; font-family: var(--mono); letter-spacing: .04em; white-space: nowrap; overflow: hidden; }
+.vfield span.box.focus { border-color: #2563eb; box-shadow: 0 0 0 2px #bfdbfe; }
+.vbtn { margin-top: auto; padding: .7em; border-radius: .7em; background: #2563eb; color: #fff; font-weight: 700; text-align: center; transition: transform .15s, filter .15s; }
+.vbtn.press { transform: scale(.94); filter: brightness(.85); }
+.vok { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .6em; background: #f9fafb; text-align: center; font-weight: 700; font-size: 1.15em; opacity: 0; transition: opacity .3s; }
+.vok.on { opacity: 1; }
+.vok i { width: 3.2em; height: 3.2em; border-radius: 50%; background: #d1fae5; color: #059669; display: flex; align-items: center; justify-content: center; font-style: normal; font-size: 1.2em; }
+.vlist { display: grid; gap: .5em; }
+.vitem { display: flex; align-items: center; gap: .6em; padding: .55em .6em; border-radius: .7em; background: #fff; border: 1px solid #e5e7eb; font-size: .88em; font-weight: 500; opacity: 0; transform: translateY(.6em); transition: opacity .3s, transform .3s; }
+.vitem.on { opacity: 1; transform: none; }
+.vitem .cb { width: 1.2em; height: 1.2em; border-radius: .3em; border: 2px solid #2563eb; background: #2563eb; flex: none; }
+.vgrid { display: grid; grid-template-columns: 1fr 1fr; gap: .6em; }
+.vtile { min-height: 5.4em; padding: .6em; border-radius: .8em; background: #fff; border: 1px solid #e5e7eb; display: flex; flex-direction: column; justify-content: space-between; font-size: .85em; font-weight: 600; transform: scale(.6); opacity: 0; transition: transform .3s cubic-bezier(.2,.9,.3,1.3), opacity .25s; }
+.vtile.on { transform: none; opacity: 1; }
+.vtile small { font-weight: 600; color: #2563eb; }
+.spin { width: 2.4em; height: 2.4em; border-radius: 50%; border: .3em solid #dbeafe; border-top-color: #2563eb; animation: spin 1s linear infinite; margin: 1em auto 0; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.chips { display: flex; gap: .4em; }
+.chips span { padding: .3em .7em; border-radius: 99px; background: #e5e7eb; font-size: .8em; font-weight: 600; color: #374151; transition: background .2s, color .2s; }
+.chips span.sel { background: #2563eb; color: #fff; }
+.avs { display: flex; gap: .4em; }
+.avs span { width: 2.2em; height: 2.2em; border-radius: 50%; background: #e0f2fe; display: flex; align-items: center; justify-content: center; transition: box-shadow .2s, background .2s; }
+.avs span.sel { background: #38bdf8; box-shadow: 0 0 0 .2em #0284c7; }
+.avs svg { width: 1.3em; height: 1.3em; fill: none; stroke: #0c4a6e; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.pin { display: flex; gap: .5em; }
+.pin i { width: .8em; height: .8em; border-radius: 50%; border: 2px solid #9ca3af; transition: background .2s; }
+.pin i.on { background: #111827; border-color: #111827; }
+.kidscr { position: absolute; inset: 0; padding: 3.4cqh 1.4cqh 1.4cqh; background: linear-gradient(160deg, #e0f2fe, #eef2ff 50%, #ede9fe); font-family: "Fredoka", ui-rounded, system-ui, sans-serif; display: flex; flex-direction: column; gap: 1cqh; opacity: 0; transition: opacity .35s; }
+.kidscr.on { opacity: 1; }
+.kt { border-radius: 1em; padding: .7em; min-height: 6em; background: #fff; display: flex; flex-direction: column; justify-content: space-between; font-weight: 600; font-size: .95em; transition: background .3s, box-shadow .3s; }
+.kt.lit { background: #fde68a; box-shadow: 0 0 0 .3em rgba(251,191,36,.35), 0 1em 2.4em rgba(251,191,36,.55); }
+.kt small { font-weight: 700; color: #6b7280; }
+.kt.lit small { color: #92400e; }
+.gn { margin-top: auto; border-radius: 1em; background: #312e81; color: #fff; padding: .7em; text-align: center; font-weight: 700; font-size: 1.1em; }
+.hubart { width: 76cqw; max-width: 125cqh; height: auto; flex: none; }
+.labelart { width: 38cqw; flex: none; border-radius: 2cqh; background: #f8fafc; color: #0f172a; padding: 3cqh; display: grid; gap: 1.4cqh; font-size: 2.4cqh; box-shadow: 0 2cqh 6cqh -2cqh rgb(0 0 0 / 60%); }
+.labelart .code { font-family: var(--mono); font-weight: 700; font-size: 1.35em; padding: .4em .5em; border-radius: .4em; border: 2px dashed #94a3b8; text-align: center; transition: border-color .3s, background .3s; letter-spacing: .03em; }
+.labelart .code.hi { border-color: #2563eb; background: #dbeafe; }
+.labelart small { color: #64748b; }
+.vcap { position: absolute; left: 0; right: 0; bottom: 9cqh; padding: 0 6cqw; text-align: center; }
+.vcap span { display: inline-block; max-width: 92%; padding: .35em .7em; border-radius: .5em; background: rgb(0 0 0 / 72%); font-size: 2.9cqh; line-height: 1.35; }
+.vbar { position: absolute; left: 0; right: 0; bottom: 0; display: flex; align-items: center; gap: 2cqw; padding: 1.6cqh 2.4cqw; background: linear-gradient(transparent, rgb(0 0 0 / 70%)); }
+.vbar button.pp { width: 6.4cqh; height: 6.4cqh; min-width: 32px; min-height: 32px; border-radius: 50%; border: 0; background: #fff; color: #0b1220; display: flex; align-items: center; justify-content: center; cursor: pointer; flex: none; }
+.vbar button.pp svg { width: 55%; height: 55%; fill: currentColor; }
+.vprog { position: relative; flex: 1; height: 1.2cqh; min-height: 5px; border-radius: 99px; background: rgb(255 255 255 / 25%); cursor: pointer; display: flex; gap: 3px; }
+.vprog i { flex: 1; border-radius: 99px; background: rgb(255 255 255 / 25%); overflow: hidden; }
+.vprog i b { display: block; height: 100%; width: 0; background: #fff; }
+.vtime { font-family: var(--mono); font-size: max(11px, 2.4cqh); color: rgb(255 255 255 / 85%); flex: none; }
+.chapters { display: grid; gap: 8px; }
+.chapter { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 14px 16px; text-align: left; cursor: pointer; transition: border-color .2s, box-shadow .2s; }
+.chapter .n { width: 32px; height: 32px; border-radius: 50%; background: var(--chip); color: var(--soft); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; }
+.chapter b { display: block; font-size: 15px; }
+.chapter span.d { font-size: 13px; color: var(--muted); }
+.chapter .len { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+.chapter[aria-current="true"] { border-color: var(--blue); box-shadow: 0 0 0 3px var(--blue-soft), var(--shadow); }
+.chapter[aria-current="true"] .n { background: var(--blue); color: #fff; }
+@media (max-width: 860px) { .player { grid-template-columns: 1fr; } }
+@media (max-width: 640px) {
+  .vid { aspect-ratio: 4 / 5; }
+  .scene { padding: 11cqh 6cqw 17cqh; }
+  .scene .hubart, .scene .labelart { display: none; }
+  .scene.s1 .hubart { display: block; width: 86cqw; max-width: none; }
+  .vphone { height: 66cqh; font-size: 1.95cqh; }
+  .stitle { font-size: 3.4cqh; }
+  .vcap span { font-size: 2.5cqh; }
+}
+
+.vitem em { display: block; font-style: normal; font-size: .82em; font-weight: 500; color: #6b7280; }
+.vmore { justify-content: flex-start; align-items: stretch; text-align: left; padding: 3.4cqh 1.6cqh 1.6cqh; font-size: 1em; gap: .5em; }
+.vway { display: flex; align-items: center; gap: .6em; padding: .55em .6em; border-radius: .7em; background: #fff; border: 1px solid #e5e7eb; font-size: .88em; font-weight: 600; opacity: 0; transform: translateY(.5em); transition: opacity .25s, transform .25s, border-color .2s, box-shadow .2s; }
+.vway.on { opacity: 1; transform: none; }
+.vway.hi { border-color: #2563eb; box-shadow: 0 0 0 2px #bfdbfe; }
+.vway svg { width: 1.4em; height: 1.4em; flex: none; fill: none; stroke: #2563eb; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.vway em { display: block; font-style: normal; font-weight: 500; font-size: .85em; color: #6b7280; }
+.vtoast { margin-top: auto; padding: .6em .7em; border-radius: .7em; background: #111827; color: #fff; font-size: .85em; font-weight: 600; opacity: 0; transition: opacity .25s; }
+.vtoast.on { opacity: 1; }
+.protos { display: grid; gap: 1.2cqh; width: 30cqw; flex: none; }
+.protos span { display: flex; align-items: center; gap: 1cqw; padding: 1.1cqh 1.4cqw; border-radius: 1.4cqh; background: rgb(255 255 255 / 8%); border: 1px solid rgb(255 255 255 / 14%); color: rgb(255 255 255 / 55%); font-size: 2.5cqh; font-weight: 600; transition: background .25s, color .25s, border-color .25s; }
+.protos span.on { background: rgb(37 99 235 / 35%); border-color: #60a5fa; color: #fff; }
+.protos span i { width: 1.1cqh; height: 1.1cqh; border-radius: 50%; background: currentColor; flex: none; }
+@media (max-width: 640px) { .protos { display: none; } }
+/* Interactive bits (kids video): the "your turn" prompt sits in the caption */
+.vcap button { margin-left: .5em; padding: .3em .8em; border-radius: 99px; border: 0; background: #facc15; color: #111827; font: 700 2.6cqh var(--sans); cursor: pointer; vertical-align: middle; }
+.vcap .turn { background: #1d4ed8; }
+.hot { outline: .35em solid #facc15; outline-offset: .15em; animation: hot 1s ease-in-out infinite; }
+@keyframes hot { 50% { outline-color: rgb(250 204 21 / 35%); } }
+.kvid .vphone button { pointer-events: auto; cursor: pointer; border: 0; font: inherit; color: inherit; text-align: left; }
+.kvid .scene { pointer-events: auto; }
+.klayer { position: absolute; inset: 0; padding: 3.4cqh 1.4cqh 1.4cqh; display: flex; flex-direction: column; gap: 1cqh; background: linear-gradient(160deg, #e0f2fe, #eef2ff 50%, #ede9fe); font-family: "Fredoka", ui-rounded, system-ui, sans-serif; opacity: 0; transition: opacity .3s; pointer-events: none; }
+.klayer.on { opacity: 1; pointer-events: auto; }
+.kwho { display: grid; grid-template-columns: 1fr 1fr; gap: .7em; }
+.kwho button { display: flex; flex-direction: column; align-items: center; gap: .3em; padding: .7em .3em; border-radius: 1em; background: #fff !important; font-weight: 600 !important; text-align: center !important; transition: box-shadow .2s; }
+.kwho button.sel { box-shadow: 0 0 0 .25em #0284c7; }
+.kwho i { width: 2.6em; height: 2.6em; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-style: normal; }
+.kwho svg { width: 1.6em; height: 1.6em; fill: none; stroke: #fff; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.kq { padding: .5em .6em; border-radius: .8em; background: #312e81; color: #fff; font-size: .85em; font-weight: 500; line-height: 1.3; }
+.kt.wig { animation: nope .4s 2; }
+.kt.fanon { background: #a5f3fc; box-shadow: 0 0 0 .3em rgba(6,182,212,.3), 0 1em 2.4em rgba(6,182,212,.45); }
+.kt.fanon small { color: #155e75; }
+.ksay { font-size: .85em; font-weight: 600; color: #3730a3; text-align: center; min-height: 2.6em; }
+.knightv { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .4em; background: radial-gradient(circle at 50% 30%, #312e81, #0b1026); color: #fff; font: 700 1.3em "Fredoka", ui-rounded, system-ui, sans-serif; opacity: 0; transition: opacity .4s; pointer-events: none; text-align: center; }
+.knightv.on { opacity: 1; }
+.knightv b { font-size: 3em; color: #fef08a; line-height: 1; }
+.kidbg { background: radial-gradient(120% 90% at 20% 10%, #6d28d9 0%, #1e1b4b 65%); }
+
+/* --- Kids ------------------------------------------------------------------ */
+.kids { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); gap: 32px; align-items: center; }
+.kphone { width: min(340px, 100%); margin-inline: auto; border-radius: 44px; padding: 10px; background: #0b1220; box-shadow: 0 30px 60px -24px rgb(0 0 0 / 55%); }
+.kpage { position: relative; overflow: hidden; border-radius: 35px; padding: 26px 16px 16px; display: grid; gap: 12px; font-family: "Fredoka", ui-rounded, system-ui, sans-serif; color: #111827; transition: background .4s; background: var(--kp, linear-gradient(160deg, #e0f2fe, #eef2ff 50%, #ede9fe)); }
+.khello { display: flex; align-items: center; gap: 12px; font-size: 22px; font-weight: 700; line-height: 1.15; }
+.kav { width: 52px; height: 52px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: var(--kb, #38bdf8); color: #fff; flex: none; transition: background .4s; }
+.kav svg { width: 30px; height: 30px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.kquiet { display: none; padding: 10px 12px; border-radius: 16px; background: #312e81; color: #fff; font-size: 15px; font-weight: 500; line-height: 1.3; }
+.kpage.quiet .kquiet { display: block; }
+.kgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.ktile { border: 0; border-radius: 22px; padding: 14px; min-height: 128px; display: flex; flex-direction: column; justify-content: space-between; align-items: flex-start; text-align: left; background: #fff; font-family: inherit; cursor: pointer; transition: background .25s, box-shadow .25s, transform .15s; }
+.ktile:active { transform: scale(.95); }
+.ktile .ki { width: 46px; height: 46px; border-radius: 15px; display: flex; align-items: center; justify-content: center; background: #e5e7eb; color: #6b7280; transition: background .25s, color .25s; }
+.ktile .ki svg { width: 26px; height: 26px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.ktile b { display: block; font-size: 18px; font-weight: 600; }
+.ktile small { font-size: 16px; font-weight: 700; color: #6b7280; }
+.ktile.on[data-kind="light"] { background: #fde68a; box-shadow: 0 0 0 6px rgba(251,191,36,.35), 0 18px 40px rgba(251,191,36,.5); }
+.ktile.on[data-kind="light"] .ki { background: #fbbf24; color: #451a03; }
+.ktile.on[data-kind="light"] small { color: #92400e; }
+.ktile.on[data-kind="fan"] { background: #a5f3fc; box-shadow: 0 0 0 6px rgba(6,182,212,.3), 0 18px 40px rgba(6,182,212,.45); }
+.ktile.on[data-kind="fan"] .ki { background: #06b6d4; color: #fff; }
+.ktile.on[data-kind="fan"] small { color: #155e75; }
+.ktile.on[data-kind="tv"] { background: #ddd6fe; box-shadow: 0 0 0 6px rgba(139,92,246,.3), 0 18px 40px rgba(139,92,246,.45); }
+.ktile.on[data-kind="tv"] .ki { background: #8b5cf6; color: #fff; }
+.ktile.on[data-kind="tv"] small { color: #5b21b6; }
+.ktile.nope { animation: nope .4s; }
+@keyframes nope { 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+.kgn { border: 0; border-radius: 22px; padding: 14px; background: #312e81; color: #fff; font: 700 22px "Fredoka", ui-rounded, system-ui, sans-serif; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; }
+.kgn svg { width: 28px; height: 28px; fill: #fef08a; stroke: #fef08a; }
+.knight { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; background: radial-gradient(circle at 50% 30%, #312e81, #0b1026); color: #fff; font-size: 26px; font-weight: 700; opacity: 0; pointer-events: none; transition: opacity .4s; }
+.knight.on { opacity: 1; }
+.knight svg { width: 64px; height: 64px; fill: #fef08a; stroke: #fef08a; }
+.kmsg { min-height: 1.4em; font-size: 15px; font-weight: 600; color: #3730a3; text-align: center; }
+.kside { display: grid; gap: 20px; }
+.krules { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.krules .tile { padding: 18px; display: grid; gap: 8px; align-content: start; }
+.krules h3 { font-size: 16px; font-weight: 700; }
+.krules p { font-size: 14px; color: var(--soft); }
+.kctl { padding: 18px; display: grid; gap: 14px; }
+.kctl .lbl { font-size: 13px; font-weight: 600; color: var(--muted); }
+.swatches { display: flex; flex-wrap: wrap; gap: 8px; }
+.swatches button { width: 40px; height: 40px; border-radius: 50%; border: 3px solid transparent; cursor: pointer; }
+.swatches button[aria-pressed="true"] { border-color: var(--ink); }
+.switch { display: flex; align-items: center; justify-content: space-between; gap: 12px; font-weight: 600; font-size: 15px; cursor: pointer; }
+.switch .toggle { width: 44px; height: 26px; }
+.switch .toggle::after { width: 20px; height: 20px; }
+.switch .toggle.on::after { transform: translateX(18px); }
+@media (max-width: 900px) { .kids { grid-template-columns: 1fr; } }
+@media (max-width: 480px) { .krules { grid-template-columns: 1fr; } }
+
+.cta { padding: 48px 32px; text-align: center; display: grid; justify-items: center; gap: 16px; background: var(--blue); border-color: var(--blue); color: #fff; }
+.cta h2 { font-size: clamp(30px, 4.5vw, 48px); font-weight: 800; }
+.cta p { max-width: 50ch; color: rgb(255 255 255 / 85%); font-size: 17px; }
+.cta .btn { background: #fff; color: #1d4ed8; border-color: #fff; }
+footer { padding-block: 28px 44px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; font-size: 14px; color: var(--muted); }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; animation: none !important; } }
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-bulb" viewBox="0 0 24 24"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></symbol>
+  <symbol id="i-plug" viewBox="0 0 24 24"><path d="M12 22v-5"/><path d="M9 8V2"/><path d="M15 8V2"/><path d="M18 8v5a4 4 0 0 1-4 4h-4a4 4 0 0 1-4-4V8Z"/></symbol>
+  <symbol id="i-drop" viewBox="0 0 24 24"><path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></symbol>
+  <symbol id="i-unlock" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></symbol>
+  <symbol id="i-cam" viewBox="0 0 24 24"><path d="m16 13 5.2 3.5a.5.5 0 0 0 .8-.4V7.9a.5.5 0 0 0-.8-.4L16 10.5"/><rect x="2" y="6" width="14" height="12" rx="2"/></symbol>
+  <symbol id="i-temp" viewBox="0 0 24 24"><path d="M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0Z"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+  <symbol id="i-hub" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="10" rx="2"/><path d="M7 12h.01"/><path d="M11 12h6"/></symbol>
+  <symbol id="i-phone" viewBox="0 0 24 24"><rect x="6" y="2" width="12" height="20" rx="2"/><path d="M11 18h2"/></symbol>
+  <symbol id="i-cloud" viewBox="0 0 24 24"><path d="M17.5 19H9a7 7 0 1 1 6.7-9h1.8a4.5 4.5 0 1 1 0 9Z"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><path d="m21.7 18-8-14a2 2 0 0 0-3.5 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.7-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></symbol>
+  <symbol id="i-tap" viewBox="0 0 24 24"><path d="M9 9V4.5a1.5 1.5 0 0 1 3 0V12"/><path d="M12 10.5a1.5 1.5 0 0 1 3 0V12"/><path d="M15 11a1.5 1.5 0 0 1 3 0v3a6 6 0 0 1-6 6h-1a6 6 0 0 1-5-2.7L3.6 14a1.5 1.5 0 0 1 2.5-1.6L9 15"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.9"/><path d="M16 3.1a4 4 0 0 1 0 7.8"/></symbol>
+  <symbol id="i-guest" viewBox="0 0 24 24"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></symbol>
+  <symbol id="i-building" viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M9 22v-4h6v4"/><path d="M8 6h.01M16 6h.01M12 6h.01M12 10h.01M12 14h.01M16 10h.01M16 14h.01M8 10h.01M8 14h.01"/></symbol>
+</svg>
+
+<header class="bar">
+  <div class="wrap">
+    <a class="brand" href="#top"><img src="data:image/png;base64,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" alt="" width="32" height="32">Ark</a>
+    <nav aria-label="Sections">
+      <a href="#setup">Setup</a>
+      <a href="#lineup">Line-up</a>
+      <a href="#kids">Kids</a>
+      <a href="#data">Your data</a>
+      <a href="#backups">Backups</a>
+      <a href="#compare">Compare</a>
+    </nav>
+    <a class="btn primary" href="#lineup" style="padding:8px 14px;font-size:14px">Find your Ark</a>
+  </div>
+</header>
+
+<main class="wrap" id="top">
+  <div class="hero">
+    <div>
+      <p class="eyebrow">The smart home hub that lives in your home</p>
+      <h1>Your home. Your data. <span>Your hub.</span></h1>
+      <p class="lead">Ark runs your lights, plugs, sensors, locks and cameras from a hub you own. Everything about your home is stored on that hub, never on our servers, and it keeps working when the internet goes down.</p>
+      <div class="row">
+        <a class="btn primary" href="#setup"><svg class="icon" viewBox="0 0 24 24" style="fill:currentColor;stroke:none"><path d="M8 5.5v13a1 1 0 0 0 1.5.9l10.4-6.5a1 1 0 0 0 0-1.8L9.5 4.6A1 1 0 0 0 8 5.5Z"/></svg>Watch the setup</a>
+        <a class="btn" href="#lineup">See the line-up</a>
+      </div>
+      <div class="pills">
+        <span class="pill"><svg class="icon"><use href="#i-check"/></svg>No Ark account</span>
+        <span class="pill"><svg class="icon"><use href="#i-check"/></svg>Works offline</span>
+        <span class="pill"><svg class="icon"><use href="#i-check"/></svg>Encrypted backups to your cloud</span>
+      </div>
+    </div>
+
+    <div class="demo" aria-label="Try it: the Ark app on a laptop and a phone">
+      <div class="tile laptop">
+        <div class="chrome"><i></i><i></i><i></i><span>ark-7b21.local</span></div>
+        <div class="screen">
+          <div class="banner" id="banner-laptop" role="status"><svg class="icon"><use href="#i-alert"/></svg><span><b>Water leak in Kitchen</b>Kitchen sink sensor went off just now.</span></div>
+          <h4>Good evening</h4>
+          <div class="grid" data-screen="laptop"></div>
+        </div>
+      </div>
+      <div class="phone">
+        <div class="screen">
+          <span class="notch"></span>
+          <div class="banner" id="banner-phone" role="status"><svg class="icon"><use href="#i-alert"/></svg><span><b>Water leak in Kitchen</b>Kitchen sink sensor went off just now.</span></div>
+          <div class="grid" data-screen="phone"></div>
+        </div>
+      </div>
+      <p class="hint"><svg class="icon"><use href="#i-tap"/></svg>Try it: tap a tile, or set off the leak sensor. Both screens update at once.</p>
+    </div>
+  </div>
+
+  <section id="setup" aria-labelledby="setup-h">
+    <div class="head">
+      <p class="eyebrow">Setup</p>
+      <h2 id="setup-h">Set up in four steps. No account, no cloud.</h2>
+      <p class="lead">Plug it in, type the code from its label, add your devices in one go, then bring the family in. Watch each step, or jump to the one you need.</p>
+    </div>
+    <div class="player">
+      <div class="vid" id="vid" role="region" aria-roledescription="video" aria-label="How to set up Ark" tabindex="-1">
+        <!-- 1. Plug in -->
+        <div class="scene s1" data-scene="0">
+          <p class="stitle"><b>1</b>Plug it in</p>
+          <svg class="hubart" viewBox="0 0 400 200" aria-hidden="true">
+            <rect x="20" y="70" width="110" height="60" rx="10" fill="#1e293b" stroke="#334155" stroke-width="2"/>
+            <g fill="#334155"><rect x="32" y="56" width="4" height="16" rx="2"/><rect x="114" y="56" width="4" height="16" rx="2"/></g>
+            <g fill="#22c55e"><circle cx="40" cy="112" r="3"/><circle cx="52" cy="112" r="3"/><circle cx="64" cy="112" r="3"/></g>
+            <text x="75" y="95" fill="#94a3b8" font-size="12" text-anchor="middle" font-family="Inter, sans-serif">Your router</text>
+            <rect x="250" y="66" width="130" height="68" rx="14" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+            <rect x="250" y="66" width="130" height="16" rx="8" fill="#e2e8f0"/>
+            <g transform="translate(315 108) rotate(45)"><rect x="-13" y="-3" width="26" height="6" rx="2" fill="#2563eb"/><rect x="-3" y="-13" width="6" height="26" rx="2" fill="#2563eb" opacity=".7"/></g>
+            <circle id="v-led" cx="364" cy="122" r="5" fill="#f59e0b"/>
+            <text x="315" y="160" fill="#94a3b8" font-size="12" text-anchor="middle" font-family="Inter, sans-serif">Ark hub</text>
+            <path id="v-eth" d="M130 100 C 180 100, 200 100, 250 100" fill="none" stroke="#60a5fa" stroke-width="5" stroke-linecap="round" pathLength="100" stroke-dasharray="100" stroke-dashoffset="100"/>
+            <path id="v-pwr" d="M315 190 L 315 134" fill="none" stroke="#e2e8f0" stroke-width="5" stroke-linecap="round" pathLength="100" stroke-dasharray="100" stroke-dashoffset="100"/>
+            <text id="v-ready" x="315" y="40" fill="#4ade80" font-size="15" font-weight="700" text-anchor="middle" font-family="Inter, sans-serif" opacity="0">Ready</text>
+          </svg>
+        </div>
+        <!-- 2. Claim -->
+        <div class="scene s2" data-scene="1">
+          <p class="stitle"><b>2</b>Type the code from the label</p>
+          <div class="labelart" aria-hidden="true">
+            <small>Under your hub</small>
+            <strong>Ark Home · ark-7b21</strong>
+            <small>Setup code</small>
+            <span class="code" id="v-label">ABCD-EFGH-JKMN-PQRS</span>
+            <small>Keep this label. It also resets a forgotten password.</small>
+          </div>
+          <div class="vphone" aria-hidden="true"><div class="vscreen">
+            <h5>Set up your Ark</h5>
+            <span class="sub">Who is this hub for? A family home</span>
+            <label class="vfield">Your name<span class="box" id="v-name"></span></label>
+            <label class="vfield">Password<span class="box" id="v-pass"></span></label>
+            <label class="vfield">Setup code<span class="box" id="v-code"></span></label>
+            <span class="vbtn" id="v-finish">Finish</span>
+            <div class="vok" id="v-ok"><i>✓</i>Welcome home, Ade!<span class="sub" style="font-weight:500">You're the admin.</span></div>
+          </div></div>
+        </div>
+        <!-- 3. Add devices -->
+        <div class="scene s3" data-scene="2">
+          <p class="stitle"><b>3</b>Add every device at once</p>
+          <div class="vphone" aria-hidden="true"><div class="vscreen">
+            <h5 id="v-findh">Looking for devices...</h5>
+            <div class="spin" id="v-spin"></div>
+            <div class="vlist" id="v-list">
+              <span class="vitem"><span class="cb"></span><span>Living room lamp<em>Wi-Fi · TP-Link</em></span></span>
+              <span class="vitem"><span class="cb"></span><span>Kettle plug<em>Wi-Fi · Tapo</em></span></span>
+              <span class="vitem"><span class="cb"></span><span>LG TV<em>Wi-Fi · webOS</em></span></span>
+              <span class="vitem"><span class="cb"></span><span>Garage door<em>Wi-Fi · ESPHome</em></span></span>
+            </div>
+            <span class="vbtn" id="v-addall">Add all 4</span>
+            <div class="vok" id="v-home" style="justify-content:flex-start;padding:3.4cqh 1.6cqh 1.6cqh;align-items:stretch;text-align:left;font-size:1em">
+              <h5>Added 4 devices</h5>
+              <div class="vgrid">
+                <span class="vtile">Living room lamp<small>On</small></span>
+                <span class="vtile">Kettle plug<small>Off</small></span>
+                <span class="vtile">LG TV<small>Off</small></span>
+                <span class="vtile">Garage door<small>Closed</small></span>
+              </div>
+              <span class="vbtn" style="background:#fff;color:#2563eb;border:1px solid #bfdbfe">More ways to add</span>
+            </div>
+            <div class="vok vmore" id="v-more">
+              <h5>More ways to add</h5>
+              <span class="vway" id="v-w1"><svg viewBox="0 0 24 24"><path d="M4.9 19.1C1 15.2 1 8.8 4.9 4.9"/><path d="M7.8 16.2c-2.3-2.3-2.3-6.1 0-8.5"/><circle cx="12" cy="12" r="2"/><path d="M16.2 7.8c2.3 2.3 2.3 6.1 0 8.5"/><path d="M19.1 4.9C23 8.8 23 15.1 19.1 19"/></svg><span>Zigbee device<em>Sensors, bulbs, plugs: press pair on it</em></span></span>
+              <span class="vway" id="v-w2"><svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.7l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.7l7 4a2 2 0 0 0 2 0l7-4a2 2 0 0 0 1-1.7Z"/></svg><span>Matter device<em>Type or scan its setup code</em></span></span>
+              <span class="vway" id="v-w3"><svg viewBox="0 0 24 24"><path d="M22 8.35V20a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8.35A2 2 0 0 1 3.26 6.5l8-3.2a2 2 0 0 1 1.48 0l8 3.2A2 2 0 0 1 22 8.35Z"/><path d="M6 18h12M6 14h12"/></svg><span>Garage door<em>A relay and a door sensor</em></span></span>
+              <span class="vway" id="v-w4"><svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg><span>Enter it myself<em>Name, type and room</em></span></span>
+              <span class="vtoast" id="v-toast">✓ Hallway motion sensor joined (Zigbee)</span>
+            </div>
+          </div></div>
+          <div class="protos" aria-hidden="true">
+            <span id="v-p0"><i></i>Wi-Fi devices</span>
+            <span id="v-p1"><i></i>TP-Link and Tapo</span>
+            <span id="v-p2"><i></i>LG webOS TVs</span>
+            <span id="v-p3"><i></i>ESPHome, Shelly</span>
+            <span id="v-p4"><i></i>Zigbee</span>
+            <span id="v-p5"><i></i>Matter</span>
+            <span id="v-p6"><i></i>Garage doors</span>
+            <span id="v-p7"><i></i>Cameras</span>
+          </div>
+        </div>
+        <!-- 4. Family and kids -->
+        <div class="scene s4" data-scene="3">
+          <p class="stitle"><b>4</b>Bring the family in</p>
+          <div class="vphone" aria-hidden="true"><div class="vscreen">
+            <h5>Add a person</h5>
+            <label class="vfield">Name<span class="box" id="v-kname"></span></label>
+            <div class="chips"><span>Adult</span><span>Guest</span><span id="v-kid">Kid</span></div>
+            <span class="sub">Their animal</span>
+            <div class="avs"><span id="v-cat"><svg viewBox="0 0 24 24"><path d="M12 5c.67 0 1.35.09 2 .26 1.78-2 5.03-2.84 6.42-2.26 1.4.58-.42 7-.42 7 .57 1.07 1 2.24 1 3.44C21 17.9 16.97 21 12 21s-9-3-9-7.56c0-1.25.5-2.4 1-3.44 0 0-1.89-6.42-.5-7 1.39-.58 4.72.23 6.5 2.23A9.04 9.04 0 0 1 12 5Z"/><path d="M8 14v.5M16 14v.5"/></svg></span><span><svg viewBox="0 0 24 24"><path d="M3 12c2-4 6-6 10-6 4 0 7 3 8 6-1 3-4 6-8 6-4 0-8-2-10-6Z"/><path d="M3 12 1 8m2 4-2 4"/><circle cx="16" cy="11" r=".6"/></svg></span><span><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="7"/><path d="M9 3c1 2 1 3 1 4M15 3c-1 2-1 3-1 4"/><circle cx="10" cy="12" r=".6"/><circle cx="14" cy="12" r=".6"/></svg></span></div>
+            <span class="sub">PIN</span>
+            <div class="pin" id="v-pin"><i></i><i></i><i></i><i></i></div>
+            <div class="vitem on" id="v-room" style="opacity:.5"><span class="cb" id="v-roomcb" style="background:transparent"></span>Maya's room</div>
+            <span class="vbtn" id="v-save">Save</span>
+            <div class="kidscr" id="v-kidscr">
+              <div style="display:flex;align-items:center;gap:.6em;font-weight:700;font-size:1.2em"><span style="width:2.2em;height:2.2em;border-radius:50%;background:#38bdf8;display:flex;align-items:center;justify-content:center"><svg viewBox="0 0 24 24" style="width:1.3em;height:1.3em;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M12 5c.67 0 1.35.09 2 .26 1.78-2 5.03-2.84 6.42-2.26 1.4.58-.42 7-.42 7 .57 1.07 1 2.24 1 3.44C21 17.9 16.97 21 12 21s-9-3-9-7.56c0-1.25.5-2.4 1-3.44 0 0-1.89-6.42-.5-7 1.39-.58 4.72.23 6.5 2.23A9.04 9.04 0 0 1 12 5Z"/></svg></span>Hi, Maya!</div>
+              <div class="vgrid"><span class="kt" id="v-kt1">Bedroom light<small id="v-kt1s">Off</small></span><span class="kt">Fan<small>Off</small></span><span class="kt">Star lamp<small>Off</small></span><span class="kt">TV<small>Off</small></span></div>
+              <span class="gn">☾ Goodnight!</span>
+            </div>
+          </div></div>
+        </div>
+        <p class="vcap" aria-live="polite"><span id="v-cap"></span></p>
+        <div class="vbar">
+          <button type="button" class="pp" id="v-pp" aria-label="Play"><svg viewBox="0 0 24 24" id="v-ppi"><path d="M8 5.5v13a1 1 0 0 0 1.5.9l10.4-6.5a1 1 0 0 0 0-1.8L9.5 4.6A1 1 0 0 0 8 5.5Z"/></svg></button>
+          <div class="vprog" id="v-prog" role="slider" tabindex="0" aria-label="Position in the video" aria-valuemin="0" aria-valuemax="32" aria-valuenow="0" aria-valuetext="0 seconds of 32"><i style="flex:7"><b></b></i><i style="flex:7"><b></b></i><i style="flex:10"><b></b></i><i style="flex:8"><b></b></i></div>
+          <span class="vtime" id="v-time">0:00 / 0:32</span>
+        </div>
+      </div>
+      <div class="chapters" role="list" aria-label="Steps">
+        <button type="button" class="tile chapter" data-ch="0" role="listitem"><span class="n">1</span><span><b>Plug it in</b><span class="d">Router cable and power. It gets itself ready.</span></span><span class="len">0:07</span></button>
+        <button type="button" class="tile chapter" data-ch="1" role="listitem"><span class="n">2</span><span><b>Type the code from the label</b><span class="d">Your name, a password, the setup code. Done.</span></span><span class="len">0:07</span></button>
+        <button type="button" class="tile chapter" data-ch="2" role="listitem"><span class="n">3</span><span><b>Add every device at once</b><span class="d">Wi-Fi devices in one tap; Zigbee, Matter and garage doors one more.</span></span><span class="len">0:10</span></button>
+        <button type="button" class="tile chapter" data-ch="3" role="listitem"><span class="n">4</span><span><b>Bring the family in</b><span class="d">Adults, guests, and kids with their own app.</span></span><span class="len">0:08</span></button>
+      </div>
+    </div>
+  </section>
+
+  <section id="lineup" aria-labelledby="lineup-h">
+    <div class="head">
+      <p class="eyebrow">The line-up</p>
+      <h2 id="lineup-h">Which Ark fits your home?</h2>
+      <p class="lead">Every Ark runs the same software. The first time it starts, a hub checks what it's running on and sizes itself to match.</p>
+    </div>
+    <div class="seg" role="group" aria-label="Where do you live?">
+      <button type="button" data-fit="mini" aria-pressed="false">A studio or one-room flat</button>
+      <button type="button" data-fit="home" aria-pressed="true">A family home</button>
+      <button type="button" data-fit="shared" aria-pressed="false">A shared flat</button>
+      <button type="button" data-fit="building" aria-pressed="false">An apartment building</button>
+    </div>
+    <div class="products">
+      <button type="button" class="tile product" data-product="mini" aria-pressed="false">
+        <div class="art"><svg viewBox="0 0 240 180" aria-hidden="true"><ellipse cx="120" cy="138" rx="58" ry="8" fill="var(--line)"/><rect x="78" y="88" width="84" height="46" rx="10" fill="var(--tile)" stroke="var(--line)" stroke-width="2"/><rect x="78" y="88" width="84" height="12" rx="6" fill="var(--chip)"/><g transform="translate(120 117) rotate(45)"><rect x="-10" y="-2.5" width="20" height="5" rx="1.5" fill="var(--blue)"/><rect x="-2.5" y="-10" width="5" height="20" rx="1.5" fill="var(--blue)" opacity=".7"/></g><circle cx="150" cy="124" r="3" fill="var(--green)"/></svg></div>
+        <h3>Ark Mini</h3>
+        <p class="for">For a one-room flat</p>
+        <ul>
+          <li><svg class="icon"><use href="#i-check"/></svg>A small hub built around a Raspberry Pi</li>
+          <li><svg class="icon"><use href="#i-check"/></svg>Zigbee, Wi-Fi and Bluetooth devices</li>
+          <li><svg class="icon"><use href="#i-check"/></svg>Up to 2 cameras</li>
+          <li><svg class="icon"><use href="#i-check"/></svg>Automations, voice and remote access</li>
+        </ul>
+        <p class="spec">2 GB memory · SD card storage</p>
+      </button>
+      <button type="button" class="tile product" data-product="home" aria-pressed="true">
+        <div class="art"><svg viewBox="0 0 240 180" aria-hidden="true"><ellipse cx="120" cy="142" rx="76" ry="9" fill="var(--line)"/><rect x="58" y="74" width="124" height="64" rx="12" fill="var(--tile)" stroke="var(--line)" stroke-width="2"/><rect x="58" y="74" width="124" height="14" rx="7" fill="var(--chip)"/><g transform="translate(120 113) rotate(45)"><rect x="-13" y="-3" width="26" height="6" rx="2" fill="var(--blue)"/><rect x="-3" y="-13" width="6" height="26" rx="2" fill="var(--blue)" opacity=".7"/></g><circle cx="168" cy="126" r="3.5" fill="var(--green)"/><rect x="186" y="100" width="22" height="14" rx="3" fill="var(--tile)" stroke="var(--line)" stroke-width="2"/><path d="M182 107h4" stroke="var(--line)" stroke-width="2"/></svg></div>
+        <h3>Ark Home</h3>
+        <p class="for">For a family home</p>
+        <ul>
+          <li><svg class="icon"><use href="#i-check"/></svg>The whole family on one hub</li>
+          <li><svg class="icon"><use href="#i-check"/></svg>Up to 8 cameras</li>
+          <li><svg class="icon"><use href="#i-check"/></svg>Wire your own sensors to its pins</li>
+          <li><svg class="icon"><use href="#i-check"/></svg>Map your breaker panel to what it powers</li>
+        </ul>
+        <p class="spec">4 GB+ memory · optional NVMe drive</p>
+      </button>
+      <button type="button" class="tile product" data-product="shared" aria-pressed="false">
+        <div class="art"><svg viewBox="0 0 240 180" aria-hidden="true"><ellipse cx="120" cy="144" rx="84" ry="9" fill="var(--line)"/><rect x="50" y="68" width="140" height="72" rx="13" fill="var(--tile)" stroke="var(--line)" stroke-width="2"/><rect x="50" y="68" width="140" height="15" rx="7" fill="var(--chip)"/><g transform="translate(120 112) rotate(45)"><rect x="-14" y="-3.5" width="28" height="7" rx="2" fill="var(--blue)"/><rect x="-3.5" y="-14" width="7" height="28" rx="2" fill="var(--blue)" opacity=".7"/></g><circle cx="176" cy="128" r="3.5" fill="var(--green)"/><g fill="var(--blue-soft)" stroke="var(--blue)" stroke-width="1.5"><circle cx="72" cy="40" r="10"/><circle cx="120" cy="34" r="10"/><circle cx="168" cy="40" r="10"/></g><g stroke="var(--line)" stroke-width="2" stroke-dasharray="3 4"><path d="M76 50 105 76"/><path d="M120 44v24"/><path d="M164 50 135 76"/></g></svg></div>
+        <h3>Ark Shared</h3>
+        <p class="for">For a shared flat</p>
+        <ul>
+          <li><svg class="icon"><use href="#i-check"/></svg>Each housemate gets their own rooms</li>
+          <li><svg class="icon"><use href="#i-check"/></svg>Shared spaces everyone can use</li>
+          <li><svg class="icon"><use href="#i-check"/></svg>No one sees another person's rooms</li>
+          <li><svg class="icon"><use href="#i-check"/></svg>Only the admin can reach every room</li>
+        </ul>
+        <p class="spec">4 GB+ memory · NVMe recommended</p>
+      </button>
+      <button type="button" class="tile product" data-product="building" aria-pressed="false">
+        <div class="art"><svg viewBox="0 0 240 180" aria-hidden="true"><rect x="84" y="22" width="72" height="122" rx="6" fill="var(--tile)" stroke="var(--line)" stroke-width="2"/><g fill="var(--chip)"><rect x="96" y="36" width="20" height="16" rx="3"/><rect x="124" y="36" width="20" height="16" rx="3"/><rect x="96" y="62" width="20" height="16" rx="3"/><rect x="124" y="62" width="20" height="16" rx="3"/><rect x="96" y="88" width="20" height="16" rx="3"/><rect x="124" y="88" width="20" height="16" rx="3"/></g><g fill="var(--green)"><circle cx="112" cy="40" r="2.5"/><circle cx="140" cy="40" r="2.5"/><circle cx="112" cy="66" r="2.5"/><circle cx="140" cy="66" r="2.5"/><circle cx="112" cy="92" r="2.5"/></g><circle cx="140" cy="92" r="2.5" fill="var(--red)"/><path d="M84 144 H156" stroke="var(--line)" stroke-width="2"/><rect x="104" y="118" width="32" height="16" rx="4" fill="var(--blue)"/><path d="M60 126 H104 M136 126 H182" stroke="var(--blue)" stroke-width="2" stroke-dasharray="4 4"/><rect x="40" y="118" width="20" height="16" rx="3" fill="var(--tile)" stroke="var(--line)" stroke-width="2"/><rect x="182" y="118" width="20" height="16" rx="3" fill="var(--tile)" stroke="var(--line)" stroke-width="2"/></svg></div>
+        <h3>Ark Building</h3>
+        <p class="for">For apartment buildings</p>
+        <ul>
+          <li><svg class="icon"><use href="#i-check"/></svg>A management hub plus a hub in every flat</li>
+          <li><svg class="icon"><use href="#i-check"/></svg>Linked over the building's wired network</li>
+          <li><svg class="icon"><use href="#i-check"/></svg>Leak, smoke and offline alerts per flat</li>
+          <li><svg class="icon"><use href="#i-check"/></svg>Send notices to residents' phones</li>
+        </ul>
+        <p class="spec">8 GB memory · NVMe · Ethernet</p>
+      </button>
+    </div>
+    <p class="foot">Outgrow your hub? Restore a backup onto a bigger one, and your rooms, devices and automations come with you.</p>
+  </section>
+
+  <section id="kids" aria-labelledby="kids-h">
+    <div class="head">
+      <p class="eyebrow">For kids</p>
+      <h2 id="kids-h">Their own app. Your rules.</h2>
+      <p class="lead">Kids sign in with their animal and a PIN and get big, bright buttons for the things in their room, with happy sounds and a Goodnight button. Watch how it works, then try it yourself.</p>
+    </div>
+    <div class="player" style="margin-bottom:48px">
+      <div class="vid kvid kidbg" id="kvid" role="region" aria-roledescription="video" aria-label="How kids use Ark. Interactive: it stops and asks you to tap." tabindex="-1">
+        <div class="scene on">
+          <p class="stitle"><b id="kv-n">1</b><span id="kv-title">Sign in with their animal</span></p>
+          <div class="vphone"><div class="vscreen" style="padding:0">
+            <div class="klayer on" id="kv-signin">
+              <h5 style="font-size:1.25em">Who's using Ark?</h5>
+              <div class="kwho">
+                <button type="button" id="kv-cat"><i style="background:#38bdf8"><svg viewBox="0 0 24 24"><path d="M12 5c.67 0 1.35.09 2 .26 1.78-2 5.03-2.84 6.42-2.26 1.4.58-.42 7-.42 7 .57 1.07 1 2.24 1 3.44C21 17.9 16.97 21 12 21s-9-3-9-7.56c0-1.25.5-2.4 1-3.44 0 0-1.89-6.42-.5-7 1.39-.58 4.72.23 6.5 2.23A9.04 9.04 0 0 1 12 5Z"/><path d="M8 14v.5M16 14v.5"/></svg></i>Maya</button>
+                <button type="button" tabindex="-1" aria-hidden="true"><i style="background:#a78bfa"><svg viewBox="0 0 24 24"><path d="M3 12c2-4 6-6 10-6 4 0 7 3 8 6-1 3-4 6-8 6-4 0-8-2-10-6Z"/><path d="M3 12 1 8m2 4-2 4"/><circle cx="16" cy="11" r=".6"/></svg></i>Leo</button>
+                <button type="button" tabindex="-1" aria-hidden="true"><i style="background:#34d399"><svg viewBox="0 0 24 24"><circle cx="12" cy="14" r="6"/><path d="M9 8C8 5 8 3 9 2M15 8c1-3 1-5 0-6"/></svg></i>Sam</button>
+                <button type="button" tabindex="-1" aria-hidden="true"><i style="background:#f59e0b"><svg viewBox="0 0 24 24"><path d="M16 7h.01"/><path d="M3.4 18H12a8 8 0 0 0 8-8V7a4 4 0 0 0-7.3-2.3L2 20"/><path d="m20 7 2 .5-2 .5"/></svg></i>Zoe</button>
+              </div>
+              <span class="sub">Maya's PIN</span>
+              <div class="pin" id="kv-pin"><i></i><i></i><i></i><i></i></div>
+            </div>
+            <div class="klayer" id="kv-home">
+              <div style="display:flex;align-items:center;gap:.6em;font-weight:700;font-size:1.2em"><span style="width:2.2em;height:2.2em;border-radius:50%;background:#38bdf8;display:flex;align-items:center;justify-content:center"><svg viewBox="0 0 24 24" style="width:1.3em;height:1.3em;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M12 5c.67 0 1.35.09 2 .26 1.78-2 5.03-2.84 6.42-2.26 1.4.58-.42 7-.42 7 .57 1.07 1 2.24 1 3.44C21 17.9 16.97 21 12 21s-9-3-9-7.56c0-1.25.5-2.4 1-3.44 0 0-1.89-6.42-.5-7 1.39-.58 4.72.23 6.5 2.23A9.04 9.04 0 0 1 12 5Z"/></svg></span>Hi, Maya!</div>
+              <p class="kq" id="kv-quiet">Quiet time until 07:00. You can turn things off, not on.</p>
+              <div class="vgrid">
+                <button type="button" class="kt" id="kv-light">Bedroom light<small id="kv-lights">Off</small></button>
+                <button type="button" class="kt" id="kv-fan" tabindex="-1">Fan<small id="kv-fans">Off</small></button>
+                <span class="kt">Star lamp<small>Off</small></span>
+                <button type="button" class="kt" id="kv-tv">TV<small>Off</small></button>
+              </div>
+              <p class="ksay" id="kv-say"></p>
+              <button type="button" class="gn" id="kv-gn" style="color:#fff;text-align:center">☾ Goodnight!</button>
+              <div class="knightv" id="kv-night"><b>☾</b>Goodnight, Maya!<span style="font-size:.7em;font-weight:500">Sweet dreams.</span></div>
+            </div>
+          </div></div>
+          <div class="protos" aria-hidden="true">
+            <span id="kv-r1"><i></i>Animal and PIN, no email</span>
+            <span id="kv-r0"><i></i>Only Maya's room</span>
+            <span id="kv-r2"><i></i>Quiet time 20:00 to 07:00</span>
+            <span id="kv-r3"><i></i>Goodnight: all off</span>
+            <span id="kv-r4"><i></i>Never doors or locks</span>
+          </div>
+        </div>
+        <p class="vcap" aria-live="polite"><span id="kv-cap"></span></p>
+        <div class="vbar">
+          <button type="button" class="pp" id="kv-pp" aria-label="Play"><svg viewBox="0 0 24 24" id="kv-ppi"><path d="M8 5.5v13a1 1 0 0 0 1.5.9l10.4-6.5a1 1 0 0 0 0-1.8L9.5 4.6A1 1 0 0 0 8 5.5Z"/></svg></button>
+          <div class="vprog" id="kv-prog" role="slider" tabindex="0" aria-label="Position in the video" aria-valuemin="0" aria-valuemax="28" aria-valuenow="0"><i><b></b></i><i><b></b></i><i><b></b></i><i><b></b></i></div>
+          <span class="vtime" id="kv-time">0:00 / 0:28</span>
+        </div>
+      </div>
+      <div class="chapters" role="list" aria-label="Kids' video steps">
+        <button type="button" class="tile chapter" data-kch="0" role="listitem"><span class="n">1</span><span><b>Sign in with their animal</b><span class="d">Pick the animal, type the PIN. No email.</span></span><span class="len">0:07</span></button>
+        <button type="button" class="tile chapter" data-kch="1" role="listitem"><span class="n">2</span><span><b>Tap to turn it on</b><span class="d">Big buttons, happy sounds.</span></span><span class="len">0:07</span></button>
+        <button type="button" class="tile chapter" data-kch="2" role="listitem"><span class="n">3</span><span><b>Quiet time</b><span class="d">At bedtime: off works, on doesn't.</span></span><span class="len">0:07</span></button>
+        <button type="button" class="tile chapter" data-kch="3" role="listitem"><span class="n">4</span><span><b>Goodnight!</b><span class="d">One tap turns the room off.</span></span><span class="len">0:07</span></button>
+        <p class="note" style="margin:4px 0 0">Interactive: the video stops at each step and asks you to tap. If you don't, it carries on by itself.</p>
+      </div>
+    </div>
+    <h3 style="font-size:22px;font-weight:800;margin-bottom:16px">Try it yourself</h3>
+    <div class="kids">
+      <div>
+        <div class="kphone">
+          <div class="kpage" id="kpage">
+            <div class="khello"><span class="kav"><svg viewBox="0 0 24 24"><path d="M12 5c.67 0 1.35.09 2 .26 1.78-2 5.03-2.84 6.42-2.26 1.4.58-.42 7-.42 7 .57 1.07 1 2.24 1 3.44C21 17.9 16.97 21 12 21s-9-3-9-7.56c0-1.25.5-2.4 1-3.44 0 0-1.89-6.42-.5-7 1.39-.58 4.72.23 6.5 2.23A9.04 9.04 0 0 1 12 5Z"/><path d="M8 14v.5"/><path d="M16 14v.5"/><path d="M11.25 16.25h1.5L12 17l-.75-.75Z"/></svg></span><span id="khi">Good evening,<br>Maya!</span></div>
+            <p class="kquiet" role="status">Quiet time until 07:00. You can turn things off, not on.</p>
+            <div class="kgrid" role="group" aria-label="Maya's room">
+              <button type="button" class="ktile on" data-kind="light" data-word="Shining!" aria-pressed="true"><span class="ki"><svg viewBox="0 0 24 24"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg></span><span><b>Bedroom light</b><small>Shining!</small></span></button>
+              <button type="button" class="ktile" data-kind="fan" data-word="Whooosh!" aria-pressed="false"><span class="ki"><svg viewBox="0 0 24 24"><path d="M10.8 10.5a1.5 1.5 0 1 0 2.4 0"/><path d="M12 12V4.5C12 3 13 2 14.5 2.5S17 5 15 7.5L12 12"/><path d="m12 12 6.5 3.8c1.3.8 1.6 2.2.5 3.2s-3.2.8-4.5-2L12 12"/><path d="m12 12-6.5 3.8c-1.3.8-1.6 2.2-.5 3.2s3.2.8 4.5-2L12 12"/></svg></span><span><b>Fan</b><small>Off</small></span></button>
+              <button type="button" class="ktile" data-kind="light" data-word="Shining!" aria-pressed="false"><span class="ki"><svg viewBox="0 0 24 24"><path d="M12 2l2.9 6.3 6.9.6-5.2 4.6 1.6 6.8L12 16.8 5.8 20.3l1.6-6.8L2.2 8.9l6.9-.6Z"/></svg></span><span><b>Star lamp</b><small>Off</small></span></button>
+              <button type="button" class="ktile" data-kind="tv" data-word="Playing!" aria-pressed="false"><span class="ki"><svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="13" rx="2"/><path d="m17 2-5 5-5-5"/></svg></span><span><b>TV</b><small>Off</small></span></button>
+            </div>
+            <p class="kmsg" id="kmsg" aria-live="polite"></p>
+            <button type="button" class="kgn" id="kgn"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>Goodnight!</button>
+            <div class="knight" id="knight" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>Goodnight, Maya!<span style="font-size:16px;font-weight:500">Sweet dreams.</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="kside">
+        <div class="tile kctl">
+          <p class="lbl">Grown-up controls (try them)</p>
+          <div>
+            <p class="lbl" id="sw-l" style="margin-bottom:8px">Maya's favourite colour</p>
+            <div class="swatches" role="group" aria-labelledby="sw-l">
+              <button type="button" aria-pressed="true" aria-label="Sky" style="background:#0ea5e9" data-page="linear-gradient(160deg,#e0f2fe,#eef2ff 50%,#ede9fe)" data-bub="#38bdf8"></button>
+              <button type="button" aria-pressed="false" aria-label="Grape" style="background:#8b5cf6" data-page="linear-gradient(160deg,#ede9fe,#fdf4ff 50%,#e0e7ff)" data-bub="#a78bfa"></button>
+              <button type="button" aria-pressed="false" aria-label="Mint" style="background:#10b981" data-page="linear-gradient(160deg,#d1fae5,#f0fdfa 50%,#cffafe)" data-bub="#34d399"></button>
+              <button type="button" aria-pressed="false" aria-label="Sunshine" style="background:#f59e0b" data-page="linear-gradient(160deg,#fef3c7,#fefce8 50%,#ffedd5)" data-bub="#fbbf24"></button>
+              <button type="button" aria-pressed="false" aria-label="Berry" style="background:#f43f5e" data-page="linear-gradient(160deg,#ffe4e6,#fdf2f8 50%,#fae8ff)" data-bub="#fb7185"></button>
+              <button type="button" aria-pressed="false" aria-label="Tangerine" style="background:#f97316" data-page="linear-gradient(160deg,#ffedd5,#fffbeb 50%,#ffe4e6)" data-bub="#fb923c"></button>
+            </div>
+          </div>
+          <button type="button" class="switch" id="kq" aria-pressed="false" style="border:0;background:none;padding:0;text-align:left">Quiet time (bedtime)<span class="toggle" aria-hidden="true"></span></button>
+          <button type="button" class="switch" id="ks" aria-pressed="true" style="border:0;background:none;padding:0;text-align:left">Happy sounds<span class="toggle on" aria-hidden="true"></span></button>
+        </div>
+        <div class="krules">
+          <div class="tile"><span class="chip-ico on"><svg class="icon"><use href="#i-hub"/></svg></span><h3>Only their rooms</h3><p>You tick the rooms a child can use. Nothing else in the house shows up.</p></div>
+          <div class="tile"><span class="chip-ico on"><svg class="icon"><use href="#i-lock"/></svg></span><h3>Never doors or locks</h3><p>No unlocking, no garage door, no settings, no adding or deleting.</p></div>
+          <div class="tile"><span class="chip-ico on"><svg class="icon"><use href="#i-users"/></svg></span><h3>An animal and a PIN</h3><p>No email or account. Five wrong PINs pause sign-in for 10 minutes.</p></div>
+          <div class="tile"><span class="chip-ico on"><svg class="icon"><use href="#i-check"/></svg></span><h3>Grown-ups hold to leave</h3><p>Signing out takes a two-second hold, so little fingers stay in their app.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="data" aria-labelledby="data-h">
+    <div class="head">
+      <p class="eyebrow">Where your data lives</p>
+      <h2 id="data-h">In your home, unless you send it somewhere</h2>
+      <p class="lead">Most smart home systems run your home through the maker's servers. Ark runs it on the hub. Your data can only ever be in these three places.</p>
+    </div>
+    <div class="trio">
+      <div class="tile">
+        <span class="chip-ico on"><svg class="icon"><use href="#i-hub"/></svg></span>
+        <h3>On the hub</h3>
+        <p>Device history, automations, camera setups and the people who live there are kept in a database on the hub's own drive. Larger models use a fast NVMe drive.</p>
+      </div>
+      <div class="tile">
+        <span class="chip-ico on"><svg class="icon"><use href="#i-phone"/></svg></span>
+        <h3>On your phone</h3>
+        <p>At home, the app talks straight to your hub. Away from home, it connects through an encrypted <code>WireGuard</code> tunnel, and anything that helps along the way only passes on traffic it can't read. For voice commands, Ark only ever receives text, never audio.</p>
+      </div>
+      <div class="tile out">
+        <span class="chip-ico"><svg class="icon"><use href="#i-cloud"/></svg></span>
+        <h3>In your cloud, if you choose</h3>
+        <p>If you turn on backups, the hub encrypts them before they leave. They're stored in a cloud account you own, in the place you pick. We don't host them, and we can't open them.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="backups" aria-labelledby="backups-h">
+    <div class="head">
+      <p class="eyebrow">Backups</p>
+      <h2 id="backups-h">Encrypted on the hub. Stored where you choose.</h2>
+      <p class="lead">Try it: type a passphrase and choose where to keep the backup. This is what a cloud provider would be holding.</p>
+    </div>
+    <div class="vault">
+      <div class="tile">
+        <label class="field" for="pass">Your backup passphrase
+          <input class="text" id="pass" type="text" value="maple-street-2026" autocomplete="off" spellcheck="false">
+        </label>
+        <div class="dest" role="group" aria-label="Where to keep it">
+          <button type="button" aria-pressed="true" data-dest="Google Drive"><svg class="icon" style="width:16px;height:16px"><use href="#i-cloud"/></svg>Google Drive</button>
+          <button type="button" aria-pressed="false" data-dest="OneDrive"><svg class="icon" style="width:16px;height:16px"><use href="#i-cloud"/></svg>OneDrive</button>
+          <button type="button" aria-pressed="false" data-dest="Dropbox"><svg class="icon" style="width:16px;height:16px"><use href="#i-cloud"/></svg>Dropbox</button>
+          <button type="button" aria-pressed="false" data-dest="your Nextcloud"><svg class="icon" style="width:16px;height:16px"><use href="#i-hub"/></svg>Nextcloud</button>
+          <button type="button" aria-pressed="false" data-dest="your Synology NAS"><svg class="icon" style="width:16px;height:16px"><use href="#i-hub"/></svg>Synology</button>
+          <button type="button" aria-pressed="false" data-dest="any WebDAV server"><svg class="icon" style="width:16px;height:16px"><use href="#i-hub"/></svg>WebDAV</button>
+        </div>
+        <dl class="facts">
+          <dt>Encryption</dt><dd>AES-256-GCM, on the hub, before upload</dd>
+          <dt>Key</dt><dd>Made from your passphrase, which is never stored</dd>
+          <dt>Schedule</dt><dd>Daily or weekly, at the hour you pick</dd>
+          <dt>Restore</dt><dd>To this hub or a new one, Zigbee network included</dd>
+        </dl>
+        <div class="warn"><svg class="icon"><use href="#i-alert"/></svg><span>Your passphrase is the only key. If you lose it, nobody can restore that backup, including us.</span></div>
+      </div>
+      <div class="tile">
+        <div class="flow">
+          <div class="end"><span class="chip-ico on"><svg class="icon"><use href="#i-hub"/></svg></span>Your hub</div>
+          <div class="wire" aria-hidden="true"></div>
+          <div class="end"><span class="chip-ico" style="background:var(--amber-soft);color:var(--amber)"><svg class="icon"><use href="#i-cloud"/></svg></span><span id="dest-name">Google Drive</span></div>
+        </div>
+        <p class="cap" style="margin:0 0 8px">On your hub:</p>
+        <div class="bytes"><span class="plain">{"rooms":["Kitchen","Bedroom"],"devices":12,"automations":["Lights off at 11pm"]}</span></div>
+        <p class="cap" style="margin:14px 0 8px">What <span id="dest-name-2">Google Drive</span> stores:</p>
+        <div class="bytes" id="cipher" aria-live="polite">Encrypting...</div>
+        <p class="cap">Encrypted live in your browser as you type. The hub does the same with your real data.</p>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="people-h">
+    <div class="head">
+      <p class="eyebrow">Privacy between people</p>
+      <h2 id="people-h">Private from us, and from each other</h2>
+    </div>
+    <div class="people">
+      <div class="tile">
+        <span class="chip-ico on"><svg class="icon"><use href="#i-users"/></svg></span>
+        <h3>Housemates</h3>
+        <p>In a shared flat, each person sees and controls only their own rooms and the shared spaces. Their phone never even receives updates from someone else's room.</p>
+        <div class="rooms"><span class="mine">Your room</span><span class="mine">Kitchen (shared)</span><span>Sam's room</span><span>Alex's room</span></div>
+      </div>
+      <div class="tile">
+        <span class="chip-ico on"><svg class="icon"><use href="#i-guest"/></svg></span>
+        <h3>Guests</h3>
+        <p>Give a guest the rooms they're staying in. They can switch things on and off, but they can't add, change or delete anything.</p>
+      </div>
+      <div class="tile">
+        <span class="chip-ico on"><svg class="icon"><use href="#i-building"/></svg></span>
+        <h3>Building management</h3>
+        <p>The building's hub learns that each flat's hub is healthy, and whether a leak or smoke alarm went off. It never sees rooms, devices or who lives there.</p>
+      </div>
+    </div>
+  </section>
+
+
+  <section id="compare" aria-labelledby="compare-h">
+    <div class="head">
+      <p class="eyebrow">Compared</p>
+      <h2 id="compare-h">How Ark differs from a typical cloud hub</h2>
+    </div>
+    <div class="marquee" tabindex="0" aria-label="Ark compared with a typical cloud hub, one tile per question">
+      <div class="track">
+        <article class="tile ctile">
+          <span class="chip-ico on"><svg class="icon"><use href="#i-hub"/></svg></span>
+          <h3>Where your home's data is kept</h3>
+          <p class="ark-a"><span>Ark</span>On the hub, in your home</p>
+          <p class="them-a"><span>Typical cloud hub</span>On the maker's servers</p>
+        </article>
+        <article class="tile ctile">
+          <span class="chip-ico on"><svg class="icon"><use href="#i-users"/></svg></span>
+          <h3>Account with the maker</h3>
+          <p class="ark-a"><span>Ark</span>Not needed</p>
+          <p class="them-a"><span>Typical cloud hub</span>Required to set up and use</p>
+        </article>
+        <article class="tile ctile">
+          <span class="chip-ico on"><svg class="icon"><use href="#i-cloud"/></svg></span>
+          <h3>When the internet goes down</h3>
+          <p class="ark-a"><span>Ark</span>Devices and automations keep working</p>
+          <p class="them-a"><span>Typical cloud hub</span>Often limited, or stops</p>
+        </article>
+        <article class="tile ctile">
+          <span class="chip-ico on"><svg class="icon"><use href="#i-check"/></svg></span>
+          <h3>If the maker drops the product</h3>
+          <p class="ark-a"><span>Ark</span>The hub keeps running in your home</p>
+          <p class="them-a"><span>Typical cloud hub</span>Features can disappear with the service</p>
+        </article>
+        <article class="tile ctile">
+          <span class="chip-ico on"><svg class="icon"><use href="#i-phone"/></svg></span>
+          <h3>Voice commands</h3>
+          <p class="ark-a"><span>Ark</span>The hub receives text, never audio</p>
+          <p class="them-a"><span>Typical cloud hub</span>Audio usually processed in the cloud</p>
+        </article>
+        <article class="tile ctile">
+          <span class="chip-ico on"><svg class="icon"><use href="#i-lock"/></svg></span>
+          <h3>Backups</h3>
+          <p class="ark-a"><span>Ark</span>Encrypted with your key, in your chosen cloud</p>
+          <p class="them-a"><span>Typical cloud hub</span>Held by the maker, under their key</p>
+        </article>
+        <article class="tile ctile">
+          <span class="chip-ico on"><svg class="icon"><use href="#i-guest"/></svg></span>
+          <h3>Shared homes</h3>
+          <p class="ark-a"><span>Ark</span>Each person limited to their own rooms</p>
+          <p class="them-a"><span>Typical cloud hub</span>Everyone usually sees everything</p>
+        </article>
+        <article class="tile ctile" aria-hidden="true">
+          <span class="chip-ico on"><svg class="icon"><use href="#i-hub"/></svg></span>
+          <h3>Where your home's data is kept</h3>
+          <p class="ark-a"><span>Ark</span>On the hub, in your home</p>
+          <p class="them-a"><span>Typical cloud hub</span>On the maker's servers</p>
+        </article>
+        <article class="tile ctile" aria-hidden="true">
+          <span class="chip-ico on"><svg class="icon"><use href="#i-users"/></svg></span>
+          <h3>Account with the maker</h3>
+          <p class="ark-a"><span>Ark</span>Not needed</p>
+          <p class="them-a"><span>Typical cloud hub</span>Required to set up and use</p>
+        </article>
+        <article class="tile ctile" aria-hidden="true">
+          <span class="chip-ico on"><svg class="icon"><use href="#i-cloud"/></svg></span>
+          <h3>When the internet goes down</h3>
+          <p class="ark-a"><span>Ark</span>Devices and automations keep working</p>
+          <p class="them-a"><span>Typical cloud hub</span>Often limited, or stops</p>
+        </article>
+        <article class="tile ctile" aria-hidden="true">
+          <span class="chip-ico on"><svg class="icon"><use href="#i-check"/></svg></span>
+          <h3>If the maker drops the product</h3>
+          <p class="ark-a"><span>Ark</span>The hub keeps running in your home</p>
+          <p class="them-a"><span>Typical cloud hub</span>Features can disappear with the service</p>
+        </article>
+        <article class="tile ctile" aria-hidden="true">
+          <span class="chip-ico on"><svg class="icon"><use href="#i-phone"/></svg></span>
+          <h3>Voice commands</h3>
+          <p class="ark-a"><span>Ark</span>The hub receives text, never audio</p>
+          <p class="them-a"><span>Typical cloud hub</span>Audio usually processed in the cloud</p>
+        </article>
+        <article class="tile ctile" aria-hidden="true">
+          <span class="chip-ico on"><svg class="icon"><use href="#i-lock"/></svg></span>
+          <h3>Backups</h3>
+          <p class="ark-a"><span>Ark</span>Encrypted with your key, in your chosen cloud</p>
+          <p class="them-a"><span>Typical cloud hub</span>Held by the maker, under their key</p>
+        </article>
+        <article class="tile ctile" aria-hidden="true">
+          <span class="chip-ico on"><svg class="icon"><use href="#i-guest"/></svg></span>
+          <h3>Shared homes</h3>
+          <p class="ark-a"><span>Ark</span>Each person limited to their own rooms</p>
+          <p class="them-a"><span>Typical cloud hub</span>Everyone usually sees everything</p>
+        </article>
+      </div>
+    </div>
+    <p class="note">"Typical cloud-first hub" describes a common pattern among consumer smart home systems, not any one product. Some offer local control for part of what they do.</p>
+  </section>
+
+  <section aria-labelledby="cta-h">
+    <div class="tile cta">
+      <h2 id="cta-h">Keep your home under your own roof</h2>
+      <p>Choose the Ark that fits where you live, connect your devices, and own every bit of data it keeps.</p>
+      <a class="btn" href="#lineup">Find your Ark</a>
+    </div>
+  </section>
+
+  <footer>
+    <span>Ark Smart Home</span>
+    <span>Your data stays in your home.</span>
+  </footer>
+</main>
+
+<script>
+(() => {
+  // --- Live demo: one home, two screens -------------------------------------
+  const home = [
+    { id: 'lamp', name: 'Living room lamp', icon: 'bulb', kind: 'switch', on: true },
+    { id: 'plug', name: 'Kettle plug', icon: 'plug', kind: 'switch', on: false },
+    { id: 'lock', name: 'Front door', icon: 'lock', kind: 'lock', on: true },
+    { id: 'leak', name: 'Kitchen sink', icon: 'drop', kind: 'leak', on: false },
+    { id: 'temp', name: 'Bedroom', icon: 'temp', kind: 'sensor', value: '21.5°C' },
+    { id: 'cam', name: 'Porch camera', icon: 'cam', kind: 'sensor', value: 'Live' }
+  ];
+  const grids = [...document.querySelectorAll('[data-screen]')];
+  const banners = [document.getElementById('banner-laptop'), document.getElementById('banner-phone')];
+  let bannerTimer = null;
+
+  const status = (d) => d.kind === 'switch' ? (d.on ? 'On' : 'Off')
+    : d.kind === 'lock' ? (d.on ? 'Locked' : 'Unlocked')
+    : d.kind === 'leak' ? (d.on ? 'Leak!' : 'Dry') : d.value;
+  const chipClass = (d) => d.kind === 'leak' ? (d.on ? 'alarm' : '') : (d.on || d.kind === 'sensor' ? 'on' : '');
+
+  function render() {
+    for (const grid of grids) {
+      grid.innerHTML = home.map((d) => {
+        const ico = d.kind === 'lock' && !d.on ? 'unlock' : d.icon;
+        const toggle = d.kind === 'switch' ? `<span class="toggle${d.on ? ' on' : ''}" aria-hidden="true"></span>` : '';
+        const tag = d.kind === 'sensor' ? 'div' : 'button';
+        const label = d.kind === 'leak' ? `${d.name}: ${d.on ? 'clear the leak' : 'set off the leak sensor'}` : `${d.name}: ${status(d)}`;
+        return `<${tag} ${tag === 'button' ? 'type="button"' : ''} class="dtile${d.kind === 'leak' && d.on ? ' alarm' : ''}" data-id="${d.id}" aria-label="${label}">
+          <span class="top"><span class="chip-ico ${chipClass(d)}"><svg class="icon"><use href="#i-${ico}"/></svg></span>${toggle}</span>
+          <span><span class="name" style="display:block">${d.name}</span><span class="state ${d.kind === 'leak' && d.on ? 'alarm' : (d.on && d.kind !== 'leak') ? 'on' : ''}">${status(d)}</span></span>
+        </${tag}>`;
+      }).join('');
+    }
+  }
+
+  document.addEventListener('click', (e) => {
+    const t = e.target.closest('.dtile[data-id]');
+    if (!t || t.tagName !== 'BUTTON') return;
+    const d = home.find((x) => x.id === t.dataset.id);
+    d.on = !d.on;
+    render();
+    if (d.kind === 'leak') {
+      clearTimeout(bannerTimer);
+      banners.forEach((b) => b.classList.toggle('show', d.on));
+      if (d.on) bannerTimer = setTimeout(() => banners.forEach((b) => b.classList.remove('show')), 6000);
+    }
+  });
+  render();
+
+  // --- Which Ark fits ---------------------------------------------------------
+  const seg = [...document.querySelectorAll('[data-fit]')];
+  const products = [...document.querySelectorAll('[data-product]')];
+  function pick(id) {
+    seg.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.fit === id)));
+    products.forEach((p) => p.setAttribute('aria-pressed', String(p.dataset.product === id)));
+  }
+  seg.forEach((b) => b.addEventListener('click', () => pick(b.dataset.fit)));
+  products.forEach((p) => p.addEventListener('click', () => pick(p.dataset.product)));
+
+  // --- Backup demo: real AES-256-GCM in the browser ---------------------------
+  const pass = document.getElementById('pass');
+  const out = document.getElementById('cipher');
+  const plain = new TextEncoder().encode('{"rooms":["Kitchen","Bedroom"],"devices":12,"automations":["Lights off at 11pm"]}');
+  const hex = (buf) => [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, '0')).join('');
+  let run = 0;
+  async function encrypt() {
+    const mine = ++run;
+    if (!window.crypto?.subtle) { out.textContent = 'Your browser can\'t run the demo, but the hub always can.'; return; }
+    try {
+      const salt = crypto.getRandomValues(new Uint8Array(16));
+      const iv = crypto.getRandomValues(new Uint8Array(12));
+      const base = await crypto.subtle.importKey('raw', new TextEncoder().encode(pass.value || ' '), 'PBKDF2', false, ['deriveKey']);
+      const key = await crypto.subtle.deriveKey({ name: 'PBKDF2', salt, iterations: 100000, hash: 'SHA-256' }, base, { name: 'AES-GCM', length: 256 }, false, ['encrypt']);
+      const sealed = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, plain);
+      if (mine !== run) return;
+      out.textContent = `ARKBK1 ${hex(salt)} ${hex(iv)} ${hex(sealed)}`;
+    } catch (err) {
+      out.textContent = 'Couldn\'t run the demo here, but the hub always can.';
+    }
+  }
+  let typing = null;
+  pass.addEventListener('input', () => { clearTimeout(typing); typing = setTimeout(encrypt, 150); });
+  encrypt();
+
+  const dests = [...document.querySelectorAll('[data-dest]')];
+  dests.forEach((b) => b.addEventListener('click', () => {
+    dests.forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+    document.getElementById('dest-name').textContent = b.textContent.trim();
+    document.getElementById('dest-name-2').textContent = b.dataset.dest;
+    encrypt();
+  }));
+
+  // --- Video players: chapters drawn from a timeline; optional "your turn" stops --
+  const $ = (id) => document.getElementById(id);
+  const clamp = (x) => Math.max(0, Math.min(1, x));
+  const span = (p, a, b) => clamp((p - a) / (b - a));
+  const typed = (text, p, a, b) => text.slice(0, Math.round(text.length * span(p, a, b)));
+  const fmt = (s) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
+  const calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const ICON_PLAY = '<path d="M8 5.5v13a1 1 0 0 0 1.5.9l10.4-6.5a1 1 0 0 0 0-1.8L9.5 4.6A1 1 0 0 0 8 5.5Z"/>';
+  const ICON_PAUSE = '<rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/>';
+
+  function makePlayer(o) {
+    const starts = [];
+    o.lens.forEach((l, n) => starts.push(n ? starts[n - 1] + o.lens[n - 1] : 0));
+    const TOTAL = starts[starts.length - 1] + o.lens[o.lens.length - 1];
+    const prompts = o.prompts || [];
+    const at = (pr) => starts[pr.ch] + pr.p * o.lens[pr.ch];
+    const done = new Set();
+    let t = 0, playing = false, last = 0, userPaused = false, waiting = null, waitTimer = null, lastCap = '';
+
+    const where = () => { let n = o.lens.length - 1; while (n > 0 && t < starts[n]) n--; return [n, (t - starts[n]) / o.lens[n]]; };
+    function draw() {
+      const [i, p] = where();
+      o.chapters.forEach((c, n) => c.setAttribute('aria-current', String(n === i)));
+      o.segs.forEach((b, n) => { b.style.width = `${clamp((t - starts[n]) / o.lens[n]) * 100}%`; });
+      o.time.textContent = `${fmt(t)} / ${fmt(TOTAL)}`;
+      o.prog.setAttribute('aria-valuenow', String(Math.floor(t)));
+      o.prog.setAttribute('aria-valuetext', `Step ${i + 1}, ${Math.floor(t)} seconds of ${TOTAL}`);
+      if (!waiting) {
+        let c = o.captions[i][0][1];
+        for (const [q, txt] of o.captions[i]) if (p >= q) c = txt;
+        if (c !== lastCap) { o.cap.textContent = c; lastCap = c; }
+      }
+      o.draw(i, p);
+    }
+    function ask(pr) {
+      waiting = pr;
+      $(pr.target).classList.add('hot');
+      o.cap.textContent = '';
+      const turn = document.createElement('span');
+      turn.className = 'turn';
+      turn.textContent = pr.text;
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.textContent = 'Do it';
+      btn.addEventListener('click', () => answer(true));
+      o.cap.append(turn, btn);
+      lastCap = '';
+      wait();
+    }
+    function wait() { clearTimeout(waitTimer); if (waiting && playing) waitTimer = setTimeout(() => answer(false), 6000); }
+    function answer(byUser) {
+      if (!waiting) return;
+      const pr = waiting;
+      waiting = null;
+      clearTimeout(waitTimer);
+      $(pr.target).classList.remove('hot');
+      done.add(pr);
+      if (pr.act) pr.act(byUser);
+      if (!playing) setPlaying(true); else last = performance.now();
+      draw();
+    }
+    function tick(now) {
+      if (!playing) return;
+      if (!waiting) {
+        const next = t + (now - last) / 1000;
+        const pr = prompts.find((x) => !done.has(x) && at(x) >= t && at(x) <= next);
+        if (pr) { t = at(pr); draw(); ask(pr); }
+        else if (next >= TOTAL) { t = 0; done.clear(); draw(); }
+        else { t = next; draw(); }
+      }
+      last = now;
+      requestAnimationFrame(tick);
+    }
+    function setPlaying(on) {
+      playing = on;
+      o.ppi.innerHTML = on ? ICON_PAUSE : ICON_PLAY;
+      o.pp.setAttribute('aria-label', on ? 'Pause' : 'Play');
+      if (on) { last = performance.now(); requestAnimationFrame(tick); wait(); } else clearTimeout(waitTimer);
+    }
+    function seek(s) {
+      if (waiting) { $(waiting.target).classList.remove('hot'); waiting = null; clearTimeout(waitTimer); }
+      t = Math.max(0, Math.min(TOTAL - 0.01, s));
+      done.clear();
+      prompts.forEach((pr) => { if (at(pr) < t) done.add(pr); });
+      lastCap = '';
+      draw();
+    }
+    prompts.forEach((pr) => $(pr.target).addEventListener('click', () => { if (waiting === pr) answer(true); }));
+    o.pp.addEventListener('click', () => { userPaused = playing; setPlaying(!playing); });
+    o.chapters.forEach((c, n) => c.addEventListener('click', () => { seek(starts[n]); userPaused = false; setPlaying(true); }));
+    o.prog.addEventListener('click', (e) => {
+      const r = e.currentTarget.getBoundingClientRect();
+      seek(((e.clientX - r.left) / r.width) * TOTAL);
+    });
+    o.prog.addEventListener('keydown', (e) => {
+      const step = { ArrowRight: 3, ArrowUp: 3, ArrowLeft: -3, ArrowDown: -3 }[e.key];
+      if (step) { e.preventDefault(); seek(t + step); }
+      if (e.key === 'Home') { e.preventDefault(); seek(0); }
+      if (e.key === 'End') { e.preventDefault(); seek(TOTAL - 0.01); }
+    });
+    // Plays when it scrolls into view, unless the viewer paused it or prefers less motion.
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(([entry]) => {
+        if (entry.isIntersecting && !calm && !userPaused && !playing) setPlaying(true);
+        if (!entry.isIntersecting && playing) setPlaying(false);
+      }, { threshold: 0.5 }).observe(o.vid);
+    }
+    draw();
+  }
+
+  // Setup video: 7 + 7 + 10 + 8 seconds
+  const scenes = [...document.querySelectorAll('[data-scene]')];
+  const CODE = 'ABCD-EFGH-JKMN-PQRS';
+  const each = (sel, fn) => [...document.querySelectorAll(sel)].forEach(fn);
+  makePlayer({
+    vid: $('vid'), pp: $('v-pp'), ppi: $('v-ppi'), prog: $('v-prog'), time: $('v-time'), cap: $('v-cap'),
+    chapters: [...document.querySelectorAll('[data-ch]')], segs: [...document.querySelectorAll('#v-prog i b')],
+    lens: [7, 7, 10, 8],
+    captions: [
+      [[0, 'Connect the hub to your router with the cable in the box, then plug in the power.'], [0.55, 'The first start takes a few minutes while the hub makes its own keys. Then it\'s ready.']],
+      [[0, 'Open the Ark app, or the hub\'s address in a browser, and choose a password.'], [0.4, 'Type the setup code from the label under your hub. No email, no Ark account.']],
+      [[0, 'Tap Add device. Ark searches your network for Wi-Fi lights, plugs, TVs and more.'], [0.36, 'One tap adds everything it found.'], [0.62, 'Zigbee sensors, Matter devices and garage doors are one more tap: press pair, or type the code.']],
+      [[0, 'Add the people you live with. For a child: Kid, their animal, a PIN and their room.'], [0.67, 'They get their own playful app, limited to the rooms you chose.']]
+    ],
+    draw(i, p) {
+      scenes.forEach((s, n) => s.classList.toggle('on', n === i));
+      if (i === 0) {
+        $('v-eth').style.strokeDashoffset = 100 - 100 * span(p, 0.05, 0.3);
+        $('v-pwr').style.strokeDashoffset = 100 - 100 * span(p, 0.35, 0.5);
+        $('v-led').setAttribute('fill', p < 0.5 ? '#475569' : p < 0.85 ? ((performance.now() / 500) % 1 < 0.5 ? '#f59e0b' : '#78350f') : '#22c55e');
+        $('v-ready').setAttribute('opacity', p > 0.85 ? '1' : '0');
+      } else if (i === 1) {
+        $('v-name').textContent = typed('Ade', p, 0.04, 0.16);
+        $('v-pass').textContent = '•'.repeat(Math.round(10 * span(p, 0.18, 0.34)));
+        $('v-code').textContent = typed(CODE, p, 0.45, 0.74);
+        $('v-name').classList.toggle('focus', p < 0.17);
+        $('v-pass').classList.toggle('focus', p >= 0.17 && p < 0.36);
+        $('v-code').classList.toggle('focus', p >= 0.42 && p < 0.76);
+        $('v-label').classList.toggle('hi', p >= 0.4 && p < 0.8);
+        $('v-finish').classList.toggle('press', p >= 0.78 && p < 0.83);
+        $('v-ok').classList.toggle('on', p >= 0.84);
+      } else if (i === 2) {
+        $('v-spin').style.display = p < 0.14 ? 'block' : 'none';
+        $('v-findh').textContent = p < 0.14 ? 'Looking for devices...' : 'Found 4 devices';
+        each('#v-list .vitem', (el, n) => el.classList.toggle('on', p >= 0.14 + n * 0.06));
+        $('v-addall').classList.toggle('press', p >= 0.38 && p < 0.43);
+        $('v-home').classList.toggle('on', p >= 0.44);
+        each('#v-home .vtile', (el, n) => el.classList.toggle('on', p >= 0.46 + n * 0.03));
+        $('v-more').classList.toggle('on', p >= 0.62);
+        each('#v-more .vway', (el, n) => el.classList.toggle('on', p >= 0.64 + n * 0.03));
+        $('v-w1').classList.toggle('hi', p >= 0.72 && p < 0.86);
+        $('v-toast').classList.toggle('on', p >= 0.8);
+        $('v-w2').classList.toggle('hi', p >= 0.86);
+        [0.14, 0.2, 0.26, 0.32, 0.72, 0.86, 0.9, 0.94].forEach((q, n) => $(`v-p${n}`).classList.toggle('on', p >= q));
+      } else {
+        $('v-kname').textContent = typed('Maya', p, 0.03, 0.12);
+        $('v-kname').classList.toggle('focus', p < 0.14);
+        $('v-kid').classList.toggle('sel', p >= 0.18);
+        $('v-cat').classList.toggle('sel', p >= 0.28);
+        each('#v-pin i', (el, n) => el.classList.toggle('on', p >= 0.35 + n * 0.04));
+        const room = p >= 0.55;
+        $('v-room').style.opacity = room ? '1' : '.5';
+        $('v-roomcb').style.background = room ? '#2563eb' : 'transparent';
+        $('v-save').classList.toggle('press', p >= 0.6 && p < 0.65);
+        $('v-kidscr').classList.toggle('on', p >= 0.67);
+        $('v-kt1').classList.toggle('lit', p >= 0.82);
+        $('v-kt1s').textContent = p >= 0.82 ? 'Shining!' : 'Off';
+      }
+    }
+  });
+
+  // --- Kids' app demo ----------------------------------------------------------
+  const kpage = $('kpage');
+  let sounds = true, audio = null;
+  function chirp(up) {
+    if (!sounds) return;
+    try {
+      audio = audio || new (window.AudioContext || window.webkitAudioContext)();
+      (up ? [523.25, 783.99] : [659.25, 392.0]).forEach((f, n) => {
+        const o = audio.createOscillator(), g = audio.createGain(), at = audio.currentTime + n * 0.09;
+        o.type = 'sine'; o.frequency.value = f;
+        g.gain.setValueAtTime(0.0001, at);
+        g.gain.exponentialRampToValueAtTime(0.18, at + 0.02);
+        g.gain.exponentialRampToValueAtTime(0.0001, at + 0.16);
+        o.connect(g).connect(audio.destination); o.start(at); o.stop(at + 0.18);
+      });
+    } catch (err) { /* no sound here */ }
+  }
+  const hour = new Date().getHours();
+  const hello = hour < 5 ? 'Sleepy time' : hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : hour < 21 ? 'Good evening' : 'Nighty night';
+  $('khi').innerHTML = `${hello},<br>Maya!`;
+  const ktiles = [...document.querySelectorAll('.ktile')];
+  const setTile = (el, on) => {
+    el.classList.toggle('on', on);
+    el.setAttribute('aria-pressed', String(on));
+    el.querySelector('small').textContent = on ? el.dataset.word : 'Off';
+  };
+  ktiles.forEach((el) => el.addEventListener('click', () => {
+    const on = !el.classList.contains('on');
+    if (on && kpage.classList.contains('quiet')) {
+      el.classList.remove('nope'); void el.offsetWidth; el.classList.add('nope');
+      $('kmsg').textContent = 'Shh, it\'s quiet time. You can turn things off, not on.';
+      return;
+    }
+    setTile(el, on);
+    $('kmsg').textContent = '';
+    chirp(on);
+  }));
+  $('kgn').addEventListener('click', () => {
+    const onNow = ktiles.filter((el) => el.classList.contains('on'));
+    onNow.forEach((el) => setTile(el, false));
+    chirp(false);
+    $('knight').classList.add('on');
+    $('kmsg').textContent = `Goodnight, Maya! Turned off ${onNow.length} thing${onNow.length === 1 ? '' : 's'}.`;
+    setTimeout(() => $('knight').classList.remove('on'), 2200);
+  });
+  const swatches = [...document.querySelectorAll('.swatches button')];
+  swatches.forEach((b) => b.addEventListener('click', () => {
+    swatches.forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+    kpage.style.setProperty('--kp', b.dataset.page);
+    kpage.style.setProperty('--kb', b.dataset.bub);
+  }));
+  const flip = (btn, on) => { btn.setAttribute('aria-pressed', String(on)); btn.querySelector('.toggle').classList.toggle('on', on); };
+  $('kq').addEventListener('click', (e) => {
+    const on = e.currentTarget.getAttribute('aria-pressed') !== 'true';
+    flip(e.currentTarget, on);
+    kpage.classList.toggle('quiet', on);
+    $('kmsg').textContent = '';
+  });
+  $('ks').addEventListener('click', (e) => {
+    sounds = e.currentTarget.getAttribute('aria-pressed') !== 'true';
+    flip(e.currentTarget, sounds);
+  });
+
+  // --- Kids video (interactive): stops and asks the viewer to tap -------------
+  const kTitles = ['Sign in with their animal', 'Tap to turn it on', 'Quiet time', 'Goodnight!'];
+  makePlayer({
+    vid: $('kvid'), pp: $('kv-pp'), ppi: $('kv-ppi'), prog: $('kv-prog'), time: $('kv-time'), cap: $('kv-cap'),
+    chapters: [...document.querySelectorAll('[data-kch]')], segs: [...document.querySelectorAll('#kv-prog i b')],
+    lens: [7, 7, 7, 7],
+    captions: [
+      [[0, 'Kids pick their animal and type their PIN. No email, no account.'], [0.75, 'Maya\'s app opens on just her room.']],
+      [[0, 'Big, bright buttons with happy sounds.'], [0.62, 'And the fan goes Whooosh!']],
+      [[0, 'At bedtime, quiet time starts (a grown-up sets the hours).'], [0.45, 'Kids can still turn things off, but not on.']],
+      [[0, 'One tap on Goodnight turns everything in the room off.'], [0.85, 'Sweet dreams.']]
+    ],
+    prompts: [
+      { ch: 0, p: 0.3, target: 'kv-cat', text: 'Your turn: tap Maya\'s cat', act: (u) => u && chirp(true) },
+      { ch: 1, p: 0.3, target: 'kv-light', text: 'Your turn: tap the bedroom light', act: (u) => u && chirp(true) },
+      { ch: 2, p: 0.45, target: 'kv-tv', text: 'Your turn: try to turn on the TV', act: (u) => u && chirp(false) },
+      { ch: 3, p: 0.35, target: 'kv-gn', text: 'Your turn: tap Goodnight', act: (u) => u && chirp(false) }
+    ],
+    draw(i, p) {
+      $('kv-n').textContent = String(i + 1);
+      $('kv-title').textContent = kTitles[i];
+      $('kv-signin').classList.toggle('on', i === 0 && p < 0.75);
+      $('kv-home').classList.toggle('on', !(i === 0 && p < 0.75));
+      $('kv-cat').classList.toggle('sel', i === 0 && p >= 0.3);
+      each('#kv-pin i', (el, n) => el.classList.toggle('on', i === 0 && p >= 0.4 + n * 0.06));
+      $('kv-quiet').style.display = i === 2 ? 'block' : 'none';
+      const light = (i === 1 && p >= 0.3) || i === 2 || (i === 3 && p < 0.35);
+      const fan = (i === 1 && p >= 0.62) || i === 2 || (i === 3 && p < 0.35);
+      $('kv-light').classList.toggle('lit', light);
+      $('kv-lights').textContent = light ? 'Shining!' : 'Off';
+      $('kv-fan').classList.toggle('fanon', fan);
+      $('kv-fans').textContent = fan ? 'Whooosh!' : 'Off';
+      $('kv-tv').classList.toggle('wig', i === 2 && p >= 0.45 && p < 0.6);
+      $('kv-say').textContent = i === 2 && p >= 0.45 ? 'Shh, it\'s quiet time. You can turn things off, not on.' : i === 3 && p >= 0.35 ? 'Turned off 2 things.' : '';
+      $('kv-night').classList.toggle('on', i === 3 && p >= 0.35 && p < 0.85);
+      $('kv-r1').classList.toggle('on', i === 0);
+      $('kv-r0').classList.toggle('on', i >= 1);
+      $('kv-r2').classList.toggle('on', i === 2);
+      $('kv-r3').classList.toggle('on', i === 3);
+      $('kv-r4').classList.toggle('on', i >= 1);
+    }
+  });
+})();
+
+</script>
+</body>
+</html>
