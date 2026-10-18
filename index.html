@@ -3,13 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-RFlDIc+EHf8MgMnDy+33kB+95xBnw+hdZrA6lvS39m8='; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src 'none'; media-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="no-referrer">
 <meta name="description" content="Ark: the smart home hub that keeps your home's data in your home. No account, works offline, encrypted backups to your own cloud.">
 <title>Ark Smart Home</title>
 </head>
 <body>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Fredoka:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="fonts/fonts.css">
 <style>
 /* Layout: the app's own look - gray ground, white rounded tiles, blue accent -
    blown up into big tiles. The hero is a live, synced phone + laptop. */
@@ -340,6 +340,23 @@ input.text:focus { outline: 2px solid var(--blue); outline-offset: 0; border-col
 .knightv b { font-size: 3em; color: #fef08a; line-height: 1; }
 .kidbg { background: radial-gradient(120% 90% at 20% 10%, #6d28d9 0%, #1e1b4b 65%); }
 
+/* --- Speakers -------------------------------------------------------------- */
+.spk { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 16px; align-items: stretch; }
+.spk-demo { padding: 24px; display: grid; gap: 16px; align-content: start; background: radial-gradient(120% 100% at 0% 0%, var(--blue-soft), var(--tile) 60%); }
+.spk-l { font-size: 14px; font-weight: 600; color: var(--soft); }
+.spk-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.spk-btns .btn { justify-content: center; min-height: 52px; }
+.spk-btns .btn[aria-pressed="true"] { border-color: var(--blue); background: var(--blue-soft); color: var(--blue-ink); }
+.spk-wave { display: flex; align-items: center; justify-content: center; gap: 6px; height: 64px; }
+.spk-wave i { width: 6px; height: 10px; border-radius: 3px; background: var(--blue); opacity: .35; transition: height .12s, opacity .12s; }
+.spk-now { text-align: center; font-size: 14px; color: var(--muted); min-height: 1.4em; }
+.spk-cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.spk-cards .tile { padding: 20px; display: grid; gap: 8px; align-content: start; min-width: 0; }
+.spk-cards h3 { font-size: 17px; font-weight: 700; }
+.spk-cards p { font-size: 14px; color: var(--soft); }
+@media (max-width: 900px) { .spk { grid-template-columns: 1fr; } }
+@media (max-width: 480px) { .spk-cards { grid-template-columns: 1fr; } }
+
 /* --- Kids ------------------------------------------------------------------ */
 .kids { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); gap: 32px; align-items: center; }
 .kphone { width: min(340px, 100%); margin-inline: auto; border-radius: 44px; padding: 10px; background: #0b1220; box-shadow: 0 30px 60px -24px rgb(0 0 0 / 55%); }
@@ -414,6 +431,10 @@ footer { padding-block: 28px 44px; display: flex; flex-wrap: wrap; justify-conte
   <symbol id="i-tap" viewBox="0 0 24 24"><path d="M9 9V4.5a1.5 1.5 0 0 1 3 0V12"/><path d="M12 10.5a1.5 1.5 0 0 1 3 0V12"/><path d="M15 11a1.5 1.5 0 0 1 3 0v3a6 6 0 0 1-6 6h-1a6 6 0 0 1-5-2.7L3.6 14a1.5 1.5 0 0 1 2.5-1.6L9 15"/></symbol>
   <symbol id="i-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.9"/><path d="M16 3.1a4 4 0 0 1 0 7.8"/></symbol>
   <symbol id="i-guest" viewBox="0 0 24 24"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></symbol>
+  <symbol id="i-bell2" viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></symbol>
+  <symbol id="i-moon" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></symbol>
+  <symbol id="i-mega" viewBox="0 0 24 24"><path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></symbol>
+  <symbol id="i-music" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></symbol>
   <symbol id="i-building" viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M9 22v-4h6v4"/><path d="M8 6h.01M16 6h.01M12 6h.01M12 10h.01M12 14h.01M16 10h.01M16 14h.01M8 10h.01M8 14h.01"/></symbol>
 </svg>
 
@@ -424,6 +445,7 @@ footer { padding-block: 28px 44px; display: flex; flex-wrap: wrap; justify-conte
       <a href="#setup">Setup</a>
       <a href="#lineup">Line-up</a>
       <a href="#kids">Kids</a>
+      <a href="#speakers">Speakers</a>
       <a href="#data">Your data</a>
       <a href="#backups">Backups</a>
       <a href="#compare">Compare</a>
@@ -760,6 +782,33 @@ footer { padding-block: 28px 44px; display: flex; flex-wrap: wrap; justify-conte
           <div class="tile"><span class="chip-ico on"><svg class="icon"><use href="#i-users"/></svg></span><h3>An animal and a PIN</h3><p>No email or account. Five wrong PINs pause sign-in for 10 minutes.</p></div>
           <div class="tile"><span class="chip-ico on"><svg class="icon"><use href="#i-check"/></svg></span><h3>Grown-ups hold to leave</h3><p>Signing out takes a two-second hold, so little fingers stay in their app.</p></div>
         </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="speakers" aria-labelledby="speakers-h">
+    <div class="head">
+      <p class="eyebrow">Speakers</p>
+      <h2 id="speakers-h">Any Bluetooth speaker becomes the voice of your home</h2>
+      <p class="lead">Pair a speaker with the hub once. It rings when someone's at the door, says "Welcome home", reads out what you type, and plays music from everyone's phones. The voice runs on the hub, so what it says never goes to the internet.</p>
+    </div>
+    <div class="spk">
+      <div class="tile spk-demo">
+        <p class="spk-l" id="spk-l">Hear the chimes (made the same way the hub makes them)</p>
+        <div class="spk-btns" role="group" aria-labelledby="spk-l">
+          <button type="button" class="btn" data-chime="doorbell"><svg class="icon"><use href="#i-bell2"/></svg>Doorbell</button>
+          <button type="button" class="btn" data-chime="arrive"><svg class="icon"><use href="#i-users"/></svg>Welcome home</button>
+          <button type="button" class="btn" data-chime="door"><svg class="icon"><use href="#i-lock"/></svg>Door opened</button>
+          <button type="button" class="btn" data-chime="goodnight"><svg class="icon"><use href="#i-moon"/></svg>Goodnight</button>
+        </div>
+        <div class="spk-wave" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        <p class="spk-now" id="spk-now" aria-live="polite">Tap a chime.</p>
+      </div>
+      <div class="spk-cards">
+        <div class="tile"><span class="chip-ico on"><svg class="icon"><use href="#i-bell2"/></svg></span><h3>Chimes and doorbell</h3><p>Ding-dong when the doorbell button is pressed, a soft chime when a door opens, quiet at night except the doorbell.</p></div>
+        <div class="tile"><span class="chip-ico on"><svg class="icon"><use href="#i-mega"/></svg></span><h3>Announcements</h3><p>Type "Dinner's ready!" in the app, or let routines speak: "Good morning, Sam. It's 7:00." A natural voice, made on the hub, offline.</p></div>
+        <div class="tile"><span class="chip-ico on"><svg class="icon"><use href="#i-music"/></svg></span><h3>Music from any phone</h3><p>Choose <b>Ark</b> in AirPlay on an iPhone or Mac, in Spotify (Premium), or in Android apps that play to DLNA speakers.</p></div>
+        <div class="tile"><span class="chip-ico on"><svg class="icon"><use href="#i-check"/></svg></span><h3>In your automations</h3><p>"When the doorbell button is pressed, play the doorbell." Any sensor can make the speaker chime or speak.</p></div>
       </div>
     </div>
   </section>
@@ -1335,6 +1384,47 @@ footer { padding-block: 28px 44px; display: flex; flex-wrap: wrap; justify-conte
       $('kv-r4').classList.toggle('on', i >= 1);
     }
   });
+  // --- Speaker chimes: the hub's own notes, played in the browser -------------
+  const CHIMES = {
+    doorbell: { label: 'Doorbell', notes: [[659.25, 0, 1.2, 0.6, 2.2], [523.25, 0.55, 1.8, 0.6, 1.8]] },
+    arrive: { label: 'Welcome home', notes: [[392.0, 0, 0.7, 0.45, 3.5], [523.25, 0.18, 1.2, 0.5, 2.5]] },
+    door: { label: 'Door opened', notes: [[880.0, 0, 0.35, 0.35, 8], [659.25, 0.12, 0.6, 0.35, 6]] },
+    goodnight: { label: 'Goodnight', notes: [[783.99, 0, 0.8, 0.35, 3], [659.25, 0.25, 0.8, 0.35, 3], [523.25, 0.5, 1.6, 0.4, 2]] }
+  };
+  let spkAudio = null, waveTimer = null;
+  const bars = [...document.querySelectorAll('.spk-wave i')];
+  const spkBtns = [...document.querySelectorAll('[data-chime]')];
+  function ring(name) {
+    const c = CHIMES[name];
+    try {
+      spkAudio = spkAudio || new (window.AudioContext || window.webkitAudioContext)();
+      const t0 = spkAudio.currentTime + 0.02;
+      const out = spkAudio.createGain();
+      out.gain.value = 0.25;
+      out.connect(spkAudio.destination);
+      for (const [freq, at, len, gain, decay] of c.notes) {
+        for (const [mult, amp] of [[1, 1], [2, 0.3], [3, 0.08]]) {
+          const o = spkAudio.createOscillator(), g = spkAudio.createGain(), t = t0 + at;
+          o.frequency.value = freq * mult;
+          g.gain.setValueAtTime(0.0001, t);
+          g.gain.exponentialRampToValueAtTime(gain * amp, t + 0.006);
+          g.gain.exponentialRampToValueAtTime(0.0001, t + len);
+          o.connect(g).connect(out);
+          o.start(t); o.stop(t + len + 0.05);
+        }
+      }
+    } catch (err) { /* no sound in this browser */ }
+    spkBtns.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.chime === name)));
+    $('spk-now').textContent = `Playing: ${c.label}`;
+    clearInterval(waveTimer);
+    const end = Date.now() + 1600;
+    waveTimer = setInterval(() => {
+      const left = Math.max(0, end - Date.now()) / 1600;
+      bars.forEach((b) => { b.style.height = `${10 + Math.random() * 54 * left}px`; b.style.opacity = String(0.35 + 0.65 * left); });
+      if (!left) { clearInterval(waveTimer); spkBtns.forEach((b) => b.setAttribute('aria-pressed', 'false')); $('spk-now').textContent = 'Tap a chime.'; }
+    }, calm ? 400 : 90);
+  }
+  spkBtns.forEach((b) => b.addEventListener('click', () => ring(b.dataset.chime)));
 })();
 
 </script>
