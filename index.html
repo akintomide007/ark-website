@@ -397,6 +397,8 @@ input.text:focus { outline: 2px solid var(--blue); outline-offset: 0; border-col
 .hs-steps { display: flex; flex-wrap: wrap; gap: 8px 16px; font-size: 13px; color: var(--muted); }
 .hs-steps span { display: inline-flex; align-items: center; gap: 6px; }
 .hs-steps b { display: inline-grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; background: var(--blue-soft); color: var(--blue-ink); font-size: 11px; }
+.hs-try { margin-top: 18px; display: flex; flex-wrap: wrap; align-items: center; gap: 10px 12px; font-size: 15px; color: var(--soft); }
+.hs-try-tip { flex-basis: 100%; font-size: 13px; color: var(--muted); }
 .hs-cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
 .hs-cards .tile { padding: 20px; display: grid; gap: 8px; align-content: start; min-width: 0; }
 .hs-cards h3 { font-size: 17px; font-weight: 700; }
@@ -921,6 +923,12 @@ footer { padding-block: 28px 44px; display: flex; flex-wrap: wrap; justify-conte
         <div class="tile"><span class="chip-ico on"><svg class="icon"><use href="#i-mega"/></svg></span><h3>Read out, and easy to see</h3><p>One tap reads the home or a room out loud through your speaker. Bigger text, stronger contrast, less motion and spoken results, right on the screen.</p></div>
         <div class="tile"><span class="chip-ico on"><svg class="icon"><use href="#i-hub"/></svg></span><h3>Round screens too</h3><p>On a round display, Ark turns into a ring of round tiles around the clock, with a dial you turn for brightness and temperature.</p></div>
       </div>
+    </div>
+    <div class="hs-try">
+      <span>Try the real hub screen in your browser, with sample devices:</span>
+      <a class="btn primary" href="demo/?shape=round">Round screen</a>
+      <a class="btn" href="demo/?shape=rect">Rectangle screen</a>
+      <span class="hs-try-tip">Press and hold a tile to switch it. On the round screen, drag around the ring.</span>
     </div>
     <p class="note">Walk-up works with the Ark app for Android. Everyone else taps their picture. Settings like the clock and how close you need to be live on the hub and can be changed from any phone.</p>
   </section>

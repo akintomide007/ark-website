@@ -1,0 +1,6 @@
+# Ark - how to report a security problem (RFC 9116).
+# [SET BEFORE LAUNCH] Replace the contact, policy URL and expiry date.
+Contact: mailto:security@[yourdomain]
+Policy: https://[yourdomain]/security
+Preferred-Languages: en
+Expires: 2027-10-17T00:00:00.000Z

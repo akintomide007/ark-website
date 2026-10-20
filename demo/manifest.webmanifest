@@ -1,0 +1,12 @@
+{
+  "name": "Ark Home",
+  "short_name": "Ark",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#111827",
+  "theme_color": "#2563eb",
+  "icons": [
+    { "src": "/icons/ark-192.png", "sizes": "192x192", "type": "image/png" }
+  ]
+}
