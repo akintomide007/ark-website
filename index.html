@@ -404,6 +404,21 @@ input.text:focus { outline: 2px solid var(--blue); outline-offset: 0; border-col
 @media (max-width: 900px) { .hs { grid-template-columns: 1fr; } }
 @media (max-width: 480px) { .hs-cards { grid-template-columns: 1fr; } }
 @media (prefers-reduced-motion: reduce) { .hs-home { opacity: 1; } }
+/* The round screen, small, under the rectangle */
+.hs-roundwrap { display: flex; align-items: center; gap: 18px; margin-top: 6px; }
+.hs-round { position: relative; flex: none; width: min(46%, 230px); aspect-ratio: 1; border-radius: 50%; background: radial-gradient(circle at 50% 42%, #1e293b, #0b1220 62%, #020617); border: 8px solid #1f2430; box-shadow: 0 18px 40px -18px rgb(0 0 0 / 55%); container-type: inline-size; overflow: hidden; }
+.hs-round .rc { position: absolute; left: 50%; top: 50%; translate: -50% -50%; text-align: center; color: #f8fafc; }
+.hs-round .rc b { display: block; font-size: 14cqw; font-weight: 200; line-height: 1; }
+.hs-round .rc span { font-size: 5.5cqw; opacity: .7; }
+.hs-round i { position: absolute; left: 50%; top: 50%; width: 19cqw; height: 19cqw; margin: -9.5cqw; border-radius: 50%; background: #1e293b; border: 1px solid #334155; transform: rotate(var(--a)) translateY(-35cqw) rotate(calc(-1 * var(--a))); animation: hs-ringin 12s infinite; }
+.hs-round i.on { background: #2563eb; border-color: #60a5fa; }
+.hs-round i.lit { background: #fcd34d; border-color: #fde68a; box-shadow: 0 0 6cqw rgb(251 191 36 / 50%); }
+.hs-round i.heat { background: #f97316; border-color: #fdba74; }
+@keyframes hs-ringin { 0%, 100% { transform: rotate(var(--a)) translateY(-35cqw) rotate(calc(-1 * var(--a))); } 50% { transform: rotate(calc(var(--a) + 45deg)) translateY(-35cqw) rotate(calc(-1 * var(--a) - 45deg)); } }
+.hs-roundwrap p { font-size: 14px; color: var(--soft); }
+.hs-roundwrap p b { display: block; color: var(--ink); font-size: 15px; margin-bottom: 4px; }
+@media (prefers-reduced-motion: reduce) { .hs-round i { animation: none; } }
+
 
 /* --- Kids ------------------------------------------------------------------ */
 .kids { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); gap: 32px; align-items: center; }
@@ -890,6 +905,13 @@ footer { padding-block: 28px 44px; display: flex; flex-wrap: wrap; justify-conte
           <div class="hs-phone" aria-hidden="true"></div>
         </div>
         <div class="hs-steps"><span><b>1</b>Standby clock</span><span><b>2</b>Your phone comes close</span><span><b>3</b>Your home, ready to tap</span></div>
+        <div class="hs-roundwrap">
+          <div class="hs-round" role="img" aria-label="Ark on a round screen: a ring of round tiles - lights glowing amber, a thermostat in orange - around the clock.">
+            <i class="lit" style="--a:0deg"></i><i style="--a:45deg"></i><i class="on" style="--a:90deg"></i><i style="--a:135deg"></i><i class="heat" style="--a:180deg"></i><i style="--a:225deg"></i><i class="lit" style="--a:270deg"></i><i class="on" style="--a:315deg"></i>
+            <span class="rc" aria-hidden="true"><b>7:42</b><span>Living room</span></span>
+          </div>
+          <p><b>Got a round display?</b>The same Ark, as a ring you swipe around. Hold a light, or tap the heating, and the middle becomes a dial.</p>
+        </div>
       </div>
       <div class="hs-cards">
         <div class="tile"><span class="chip-ico on"><svg class="icon"><use href="#i-phone"/></svg></span><h3>It knows it's you</h3><p>Your phone sends a small, changing Bluetooth signal only your hub can read. Signed in to Ark on it? The screen opens for you. Signed out? It doesn't.</p></div>
