@@ -478,6 +478,49 @@ input.text:focus { outline: 2px solid var(--blue); outline-offset: 0; border-col
 .cta .btn { background: #fff; color: #1d4ed8; border-color: #fff; }
 footer { padding-block: 28px 44px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; font-size: 14px; color: var(--muted); }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; animation: none !important; } }
+/* Ark OS: two diagrams in plain HTML (power on to ready; what's inside) */
+.os-boot { padding: 24px; display: grid; gap: 16px; }
+.os-boot h3, .os-stack h3 { font-size: 17px; font-weight: 700; }
+.os-steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 28px; counter-reset: os; }
+.os-steps li { position: relative; display: grid; gap: 8px; align-content: start; min-width: 0; }
+.os-steps li + li::before { content: ""; position: absolute; left: -22px; top: 44px; width: 16px; height: 2px; background: var(--line); }
+.os-steps li + li::after { content: ""; position: absolute; left: -11px; top: 40px; border: 5px solid transparent; border-left-color: var(--line); }
+.os-scr { height: 88px; border-radius: 10px; background: #0b0f17; border: 1px solid var(--line); display: grid; place-items: center; color: #e5e7eb; font-size: 13px; text-align: center; padding: 6px; }
+.os-scr .logo { width: 30px; height: 30px; border-radius: 8px; background: var(--blue); display: grid; place-items: center; color: #fff; font-weight: 800; font-size: 15px; }
+.os-scr .prog { width: 72px; height: 3px; border-radius: 2px; background: rgb(255 255 255 / 18%); margin-top: 8px; overflow: hidden; }
+.os-scr .prog i { display: block; height: 100%; width: var(--w); background: var(--blue); }
+.os-scr .clk { font-size: 24px; font-weight: 300; letter-spacing: .02em; }
+.os-scr .grid { display: grid; grid-template-columns: repeat(3, 18px); gap: 4px; }
+.os-scr .grid i { height: 14px; border-radius: 3px; background: rgb(255 255 255 / 14%); }
+.os-scr .grid i.on { background: #f59e0b; }
+.os-steps b { font-size: 14px; }
+.os-steps span { font-size: 13px; color: var(--soft); }
+.os-band { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--muted); }
+.os-band::before { content: ""; flex: 1; height: 6px; border-radius: 3px; background: linear-gradient(90deg, var(--blue) 0 75%, var(--green) 75%); opacity: .8; order: 2; }
+.os-band .k1 { order: 1; } .os-band .k2 { order: 3; }
+.os-grid { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 16px; margin-top: 16px; }
+.os-stack { padding: 24px; align-self: start; display: grid; gap: 10px; align-content: start; }
+.os-layer { border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; display: grid; gap: 6px; }
+.os-layer b { font-size: 14px; }
+.os-layer p { font-size: 13px; color: var(--soft); margin: 0; }
+.os-layer .os-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.os-layer .os-tags span { font-size: 12px; padding: 2px 8px; border-radius: 999px; background: var(--chip); color: var(--soft); }
+.os-layer.you { background: var(--blue-soft); border-color: transparent; }
+.os-layer.os { border: 2px solid var(--blue); }
+.os-layer.data { border-style: dashed; }
+.os-split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 10px; }
+.os-arrow { justify-self: center; width: 2px; height: 12px; background: var(--muted); position: relative; opacity: .6; }
+.os-arrow::after { content: ""; position: absolute; left: -4px; bottom: -6px; border: 5px solid transparent; border-top-color: var(--muted); }
+.os-cards { display: grid; gap: 16px; align-content: start; }
+.os-cards .tile { padding: 20px; display: grid; gap: 8px; min-width: 0; }
+.os-cards h3 { font-size: 17px; font-weight: 700; }
+.os-cards p { font-size: 14px; color: var(--soft); }
+@media (max-width: 900px) { .os-grid { grid-template-columns: 1fr; } }
+@media (max-width: 720px) {
+  .os-steps { grid-template-columns: 1fr 1fr; gap: 20px 16px; }
+  .os-steps li::before, .os-steps li::after { display: none; }
+}
+@media (max-width: 420px) { .os-split { grid-template-columns: 1fr; } }
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -512,6 +555,7 @@ footer { padding-block: 28px 44px; display: flex; flex-wrap: wrap; justify-conte
       <a href="#kids">Kids</a>
       <a href="#speakers">Speakers</a>
       <a href="#hubscreen">Hub screen</a>
+      <a href="#os">Ark OS</a>
       <a href="#data">Your data</a>
       <a href="#backups">Backups</a>
       <a href="#compare">Compare</a>
@@ -931,6 +975,47 @@ footer { padding-block: 28px 44px; display: flex; flex-wrap: wrap; justify-conte
       <span class="hs-try-tip">Press and hold a tile to switch it. On the round screen, drag around the ring.</span>
     </div>
     <p class="note">Walk-up works with the Ark app for Android. Everyone else taps their picture. Settings like the clock and how close you need to be live on the hub and can be changed from any phone.</p>
+  </section>
+
+  <section id="os" aria-labelledby="os-h">
+    <div class="head">
+      <p class="eyebrow">Ark OS</p>
+      <h2 id="os-h">Plug it in. It's Ark from the first second.</h2>
+      <p class="lead">Every Ark runs Ark OS, our own system for the hub. There's no computer to set up and no Linux to look at: from power on, the screen shows Ark, and the hub does one job, running your home.</p>
+    </div>
+
+    <div class="tile os-boot">
+      <h3>From power on to your home</h3>
+      <ol class="os-steps" aria-label="Power on to ready, in four steps">
+        <li><div class="os-scr" aria-hidden="true"><span class="logo">A</span></div><b>1. Power on</b><span>The Ark logo, straight away. No boot text, no login prompt.</span></li>
+        <li><div class="os-scr" aria-hidden="true"><div style="display:grid;justify-items:center"><span class="logo">A</span><span class="prog" style="--w:45%"><i></i></span></div></div><b>2. The system starts</b><span>Only what Ark needs, and nothing you have to look after.</span></li>
+        <li><div class="os-scr" aria-hidden="true"><div style="display:grid;justify-items:center"><span class="logo">A</span><span class="prog" style="--w:85%"><i></i></span></div></div><b>3. Your home starts</b><span>Your devices, automations and history, from the hub's own drive.</span></li>
+        <li><div class="os-scr" aria-hidden="true"><div style="display:grid;gap:6px;justify-items:center"><span class="clk">7:42</span><span class="grid"><i class="on"></i><i></i><i class="on"></i></span></div></div><b>4. Ready</b><span>The clock, or your home if you walk up.</span></li>
+      </ol>
+      <div class="os-band"><span class="k1">Ark logo the whole way</span><span class="k2">Ready</span></div>
+    </div>
+
+    <div class="os-grid">
+      <div class="tile os-stack" role="img" aria-label="What's inside an Ark hub, from top to bottom: you, on the hub screen and the Ark app; the Ark app on the hub - database, Zigbee, Matter, cameras, speakers; Ark OS, signed and tested, starting only Ark; the hub's hardware - radios and screen; and beside the system, your home's data on its own drive.">
+        <h3>What's inside</h3>
+        <div class="os-layer you"><b>You</b><div class="os-tags"><span>Hub screen</span><span>Ark app on your phone</span><span>Kids' app</span></div></div>
+        <div class="os-arrow" aria-hidden="true"></div>
+        <div class="os-layer"><b>Ark, the app that runs your home</b><div class="os-tags"><span>Automations</span><span>Zigbee</span><span>Matter</span><span>Wi-Fi devices</span><span>Cameras</span><span>Speakers</span><span>Backups</span></div><p>Each part runs in its own container, so one can be updated or restarted without touching the rest.</p></div>
+        <div class="os-arrow" aria-hidden="true"></div>
+        <div class="os-split">
+          <div class="os-layer os"><b>Ark OS</b><p>Starts only Ark. Changes only with a tested Ark release.</p></div>
+          <div class="os-layer data"><b>Your home's data</b><p>On its own drive, apart from the system.</p></div>
+        </div>
+        <div class="os-arrow" aria-hidden="true"></div>
+        <div class="os-layer"><b>The hub</b><div class="os-tags"><span>Zigbee radio</span><span>Bluetooth</span><span>Wi-Fi</span><span>Ethernet</span><span>Touch screen</span></div></div>
+      </div>
+      <div class="os-cards">
+        <div class="tile"><span class="chip-ico on"><svg class="icon"><use href="#i-check"/></svg></span><h3>Updates you don't have to trust blindly</h3><p>Every app update is signed by us, and the hub checks the signature before it installs anything. The system itself only changes with an Ark release we've tested on the hub.</p></div>
+        <div class="tile"><span class="chip-ico on"><svg class="icon"><use href="#i-lock"/></svg></span><h3>One door, and it's locked</h3><p>The only way in from the internet is an encrypted tunnel for your own phones, and it leads only to the Ark app. Nothing else on the hub can be reached.</p></div>
+        <div class="tile"><span class="chip-ico on"><svg class="icon"><use href="#i-hub"/></svg></span><h3>Your data outlives the system</h3><p>Your home's data lives on its own drive, apart from the system. Updating the system doesn't touch it.</p></div>
+        <div class="tile"><span class="chip-ico on"><svg class="icon"><use href="#i-tap"/></svg></span><h3>Coming next: a screen without a browser</h3><p>We're moving the hub screen to an app Ark draws itself, with no web browser in between. It starts faster and moves more smoothly, and looks just the same.</p></div>
+      </div>
+    </div>
   </section>
 
   <section id="data" aria-labelledby="data-h">
